@@ -1,4 +1,4 @@
-package co.com.bancolombia.api;
+package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.dto.request.FranchiseDTO;
 import co.com.bancolombia.usecase.franchiseusecase.FranchiseUsecaseUseCase;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
 
 
 @Component
@@ -19,4 +20,5 @@ public class Handler {
                 .flatMap(dto -> useCase.createFranchise(dto.getName()))
                 .flatMap(franchise -> ServerResponse.ok().bodyValue(franchise));
     }
+
 }

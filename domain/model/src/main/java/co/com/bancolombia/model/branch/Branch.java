@@ -28,6 +28,20 @@ public class Branch {
     public static Branch create(String name) {
         return new Branch(name);
     }
+    public static Branch restore(String id, String name) {
+        return new Branch(id, name);
+    }
+    private Branch(String id, String name) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new BranchException(DomainExceptionMessage.BRANCH_ID_REQUIRED);
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new BranchException(DomainExceptionMessage.BRANCH_NAME_REQUIRED);
+        }
+        this.id = id;
+        this.name = name;
+        this.products = new ArrayList<>();
+    }
 
     public String getId() {
         return id;

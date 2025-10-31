@@ -25,6 +25,9 @@ public class FranchiseAdapter implements FranchiseRepository {
         return repository.insertFranchise(entity.getId(), entity.getName())
                 .then(Mono.just(franchise)); }
 
+
+
+
     @Override
     public Mono<Franchise> getFranchiseByName(String name) {
         return null;
