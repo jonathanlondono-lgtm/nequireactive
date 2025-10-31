@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class Branch {
 
-    private final String id;
+    private final UUID id;
     private String name;
     private final List<Product> products;
 
@@ -20,7 +20,7 @@ public class Branch {
         if (name == null || name.trim().isEmpty()) {
             throw new BranchException(DomainExceptionMessage.BRANCH_NAME_REQUIRED);
         }
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.name = name;
         this.products = new ArrayList<>();
     }
@@ -28,11 +28,11 @@ public class Branch {
     public static Branch create(String name) {
         return new Branch(name);
     }
-    public static Branch restore(String id, String name) {
+    public static Branch restore(UUID id, String name) {
         return new Branch(id, name);
     }
-    private Branch(String id, String name) {
-        if (id == null || id.trim().isEmpty()) {
+    private Branch(UUID id, String name) {
+        if (id == null ) {
             throw new BranchException(DomainExceptionMessage.BRANCH_ID_REQUIRED);
         }
         if (name == null || name.trim().isEmpty()) {
@@ -43,7 +43,7 @@ public class Branch {
         this.products = new ArrayList<>();
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
