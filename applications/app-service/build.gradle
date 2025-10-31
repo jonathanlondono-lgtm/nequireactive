@@ -1,0 +1,38 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	testImplementation 'com.tngtech.archunit:archunit:1.4.1'
+    implementation project(':reactive-web')
+    implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+    implementation project(':r2dbc-postgresql')
+    implementation project(':model')
+    implementation project(':usecase')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    runtimeOnly('org.springframework.boot:spring-boot-devtools')
+    testImplementation 'com.tngtech.archunit:archunit:1.4.0'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+}
+
+
+tasks.register('explodedJar', Copy) {
+    with jar
+    into layout.buildDirectory.dir("exploded")
+}
+
+jar {
+    // To disable the *-plain.jar
+    enabled = false
+}
+
+bootJar {
+    // Sets output jar name
+    archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
+}
+
+springBoot {
+    mainClass.set('co.com.bancolombia.MainApplication')
+}
