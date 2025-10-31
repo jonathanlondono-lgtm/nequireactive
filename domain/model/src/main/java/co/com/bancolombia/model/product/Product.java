@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class Product {
 
-    private final String id;
+    private final UUID id;
     private String name;
     private int stock;
 
@@ -19,7 +19,7 @@ public class Product {
         if (stock < 0) {
             throw new ProductException(DomainExceptionMessage.PRODUCT_STOCK_NON_NEGATIVE);
         }
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.name = name;
         this.stock = stock;
     }
@@ -28,7 +28,23 @@ public class Product {
         return new Product(name, stock);
     }
 
-    public String getId() {
+    public static Product restore(UUID id, String name, int stock) {
+        return new Product(id, name, stock);
+    }
+    private Product(UUID id, String name, int stock) {
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new ProductException(DomainExceptionMessage.PRODUCT_NAME_REQUIRED);
+        }
+        if (stock < 0) {
+            throw new ProductException(DomainExceptionMessage.PRODUCT_STOCK_NON_NEGATIVE);
+        }
+        this.id = id;
+        this.name = name;
+        this.stock = stock;
+    }
+
+    public UUID getId() {
         return id;
     }
 
