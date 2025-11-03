@@ -12,4 +12,7 @@ public interface ProductReactiveRepository extends ReactiveCrudRepository<Produc
     @Query("INSERT INTO product (id, branch_id, name, stock) VALUES ($1, $2, $3, $4)")
     Mono<Void> insertProduct(UUID id, UUID branchId, String name, int stock);
 
+    @Query("DELETE FROM product WHERE id = $1")
+    Mono<Void> deleteById(UUID id);
+
 }

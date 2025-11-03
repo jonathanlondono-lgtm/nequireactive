@@ -69,7 +69,7 @@ public class Branch {
         products.add(product);
     }
 
-    public void removeProduct(String productId) {
+    public void removeProduct(UUID productId) {
         products.removeIf(p -> p.getId().equals(productId));
     }
 

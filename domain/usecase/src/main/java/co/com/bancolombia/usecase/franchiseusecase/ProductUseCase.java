@@ -12,8 +12,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductUseCase {
 
-    private final BranchRepository branchRepository; // solo para verificar que la branch existe
-    private final ProductRepository productRepository; // para agregar producto
+    private final BranchRepository branchRepository;
+    private final ProductRepository productRepository;
 
     public Mono<Void> execute(UUID branchId, String productName, int stock) {
         return branchRepository.findById(branchId)
@@ -24,4 +24,17 @@ public class ProductUseCase {
                     return productRepository.addProductToBranch(branchId, product);
                 });
     }
+
+    public Mono<Void> execute(UUID branchId, UUID productId) {
+        return branchRepository.findById(branchId)
+                .switchIfEmpty(Mono.error(
+                        new BranchException(DomainExceptionMessage.BRANCH_NOT_FOUND, branchId.toString())
+                ))
+                .flatMap(branch ->
+                        Mono.fromRunnable(() -> branch.removeProduct(productId))
+                                .then(productRepository.deleteById(productId))
+                );
+    }
+
+
 }

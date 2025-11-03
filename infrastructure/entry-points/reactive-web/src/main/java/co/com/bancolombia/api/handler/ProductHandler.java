@@ -1,5 +1,6 @@
 package co.com.bancolombia.api.handler;
 
+import co.com.bancolombia.api.dto.request.DeleteProductRequest;
 import co.com.bancolombia.api.dto.request.ProductRequest;
 import co.com.bancolombia.model.exception.BranchException;
 import co.com.bancolombia.usecase.franchiseusecase.ProductUseCase;
@@ -31,5 +32,12 @@ public class ProductHandler {
 
 
                 });
+    }
+    public Mono<ServerResponse> deleteProduct(ServerRequest request) {
+        return request.bodyToMono(DeleteProductRequest.class)
+                .flatMap(dto ->
+                        productUseCase.execute(dto.getBranchId(), dto.getProductId())
+                                .then(ServerResponse.noContent().build())
+                );
     }
 }
