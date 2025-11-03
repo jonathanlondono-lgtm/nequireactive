@@ -4,6 +4,7 @@ import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.r2dbc.entity.BranchEntity;
+import co.com.bancolombia.r2dbc.mapper.BranchMapper;
 import co.com.bancolombia.r2dbc.mapper.FranchiseMapper;
 import co.com.bancolombia.r2dbc.repository.BranchReactiveRepository;
 import co.com.bancolombia.r2dbc.repository.FranchiseReactiveRepository;
@@ -28,7 +29,7 @@ public class BranchAdapter implements BranchRepository {
                     Branch newBranch = Branch.create(branchName);
                     franchise.addBranch(newBranch);
 
-                    UUID branchId = UUID.fromString(newBranch.getId());
+                    UUID branchId = newBranch.getId();
 
                     return branchRepository.insertBranch(branchId, franchiseId, branchName)
                             .then();
@@ -36,8 +37,9 @@ public class BranchAdapter implements BranchRepository {
     }
 
     @Override
-    public Mono<Franchise> findById(UUID id) {
-        return franchiseRepository.findById(id)
-                .map(FranchiseMapper::toDomain);
-    }
+    public Mono<Branch> findById(UUID id) {
+        return branchRepository.findById(id)
+                .map(BranchMapper::toDomain);    }
+
+
 }

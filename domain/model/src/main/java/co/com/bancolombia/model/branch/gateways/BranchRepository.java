@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface BranchRepository {
     Mono<Void> addBranchToFranchise(UUID franchiseId, String branchName);
-    Mono<Franchise> findById(UUID id);
+    Mono<Branch> findById(UUID id);
 
 }
