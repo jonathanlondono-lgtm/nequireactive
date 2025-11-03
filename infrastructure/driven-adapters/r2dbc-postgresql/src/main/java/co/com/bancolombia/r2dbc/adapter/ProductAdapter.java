@@ -34,4 +34,9 @@ public class ProductAdapter implements ProductRepository {
     public Mono<Product> findById(String productId) {
         return productRepository.findById(productId)
                 .map(ProductMapper::toDomain);    }
+
+    @Override
+    public Mono<Void> deleteById(UUID productId) {
+        return productRepository.deleteById(productId);
+    }
 }
