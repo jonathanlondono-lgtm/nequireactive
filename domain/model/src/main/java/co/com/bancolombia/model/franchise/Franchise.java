@@ -4,6 +4,7 @@ import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.enums.DomainExceptionMessage;
 import co.com.bancolombia.model.exception.BranchException;
 import co.com.bancolombia.model.exception.FranchiseException;
+import co.com.bancolombia.model.exception.ProductException;
 import co.com.bancolombia.model.product.Product;
 
 import java.util.ArrayList;
@@ -57,5 +58,18 @@ public class Franchise {
             if (topProduct != null) result.add(topProduct);
         }
         return result;
+    }
+
+    public void addProductToBranch(UUID branchId, Product product) {
+        if (product == null) {
+            throw new ProductException(DomainExceptionMessage.PRODUCT_REQUIRED);
+        }
+
+        Branch branch = branches.stream()
+                .filter(b -> b.getId().equals(branchId))
+                .findFirst()
+                .orElseThrow(() -> new BranchException(DomainExceptionMessage.BRANCH_NOT_FOUND, branchId.toString()));
+
+        branch.addProduct(product);
     }
 }

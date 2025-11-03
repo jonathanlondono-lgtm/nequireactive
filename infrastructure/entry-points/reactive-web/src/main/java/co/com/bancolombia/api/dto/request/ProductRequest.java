@@ -1,19 +1,27 @@
 package co.com.bancolombia.api.dto.request;
 
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductRequest {
 
-    @NotBlank(message = "Product name must not be blank")
+    private UUID branchId;
+
+    @NotBlank(message = "product name is required")
     private String name;
 
-    @NotNull(message = "Stock is required")
-    @Min(value = 0, message = "Stock must be non-negative")
-    private Integer stock;
+    @Min(value = 0, message = "stock must be non-negative")
+    private int stock;
 }
-

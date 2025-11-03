@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface ProductRepository {
-    Mono<Void> addProductToBranch(UUID branchId, String productName, int stock);
+    Mono<Void> addProductToBranch(UUID branchId, Product product);
     Mono<Product> findById(String productId);
 
 

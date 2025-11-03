@@ -5,8 +5,9 @@ import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
+
 @RequiredArgsConstructor
-public class FranchiseUsecaseUseCase {
+public class FranchiseUseCase {
 
     private final FranchiseRepository franchiseRepository;
 
