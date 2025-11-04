@@ -13,6 +13,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouterRest {
     @Bean
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
-        return route(POST("/api/franchise"), handler::createFranchise);
+        return route(POST("/api/franchise"), handler::createFranchise)
+                .andRoute(POST("/api/franchise/max-stock"), handler::getMaxStockByFranchise);
+
     }
 }

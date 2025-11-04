@@ -14,5 +14,8 @@ public interface BranchReactiveRepository extends ReactiveCrudRepository<BranchE
 
     @Query("INSERT INTO branch (id, franchise_id, name) VALUES (:id, :franchiseId, :name)")
     Mono<Void> insertBranch(UUID id, UUID franchiseId, String name);
+
+    @Query("SELECT * FROM branch WHERE franchise_id = $1")
+    Flux<BranchEntity> findAllByFranchiseId(UUID franchiseId);
 }
 

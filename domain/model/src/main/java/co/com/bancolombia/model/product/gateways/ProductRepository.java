@@ -12,6 +12,9 @@ public interface ProductRepository {
     Mono<Void> deleteById(UUID productId);
     Mono<Product> updateProduct(UUID productId, int newStock);
 
+    Mono<Product> findProductWithHighestStockByBranchId(UUID branchId);
+
+
 
 
 

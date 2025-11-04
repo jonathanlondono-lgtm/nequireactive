@@ -4,7 +4,6 @@ import co.com.bancolombia.api.dto.request.DeleteProductRequest;
 import co.com.bancolombia.api.dto.request.ProductRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
 import co.com.bancolombia.api.dto.response.UpdateStockResponse;
-import co.com.bancolombia.model.exception.BranchException;
 import co.com.bancolombia.usecase.franchiseusecase.ProductUseCase;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
