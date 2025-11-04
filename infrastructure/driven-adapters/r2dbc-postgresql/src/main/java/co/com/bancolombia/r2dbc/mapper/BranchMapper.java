@@ -25,6 +25,14 @@ public final class BranchMapper {
                 .build();
     }
 
+    public static BranchEntity toEntityWithoutFranchise(Branch b) {
+        if (b == null) return null;
+        return BranchEntity.builder()
+                .id(b.getId() != null ? b.getId() : UUID.randomUUID())
+                .name(b.getName())
+                .build();
+    }
+
     public static BranchEntity toNewEntity(String name, UUID franchiseId) {
         return BranchEntity.builder()
                 .id(UUID.randomUUID())
