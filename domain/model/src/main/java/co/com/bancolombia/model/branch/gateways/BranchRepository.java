@@ -10,6 +10,5 @@ public interface BranchRepository {
     Mono<Void> addBranchToFranchise(UUID franchiseId, String branchName);
     Mono<Branch> findById(UUID id);
     Flux<Branch> findAllByFranchiseId(UUID franchiseId);
-
-
+    Mono<Branch> updateBranch(Branch branch);
 }
