@@ -48,6 +48,15 @@ public class ProductUseCase {
                 });
     }
 
+    public Mono<Product> updateProductName(UUID productId, String newName) {
+        return productRepository.findById(productId.toString())
+                .switchIfEmpty(Mono.error(new ProductException(DomainExceptionMessage.PRODUCT_NOT_FOUND, productId.toString())))
+                .flatMap(product -> {
+                    product.rename(newName);
+                    return productRepository.updateProduct(product);
+                });
+    }
+
 
 
 

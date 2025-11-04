@@ -11,6 +11,7 @@ public interface ProductRepository {
     Mono<Product> findById(String productId);
     Mono<Void> deleteById(UUID productId);
     Mono<Product> updateProduct(UUID productId, int newStock);
+    Mono<Product> updateProduct(Product  product);
 
     Mono<Product> findProductWithHighestStockByBranchId(UUID branchId);
 
