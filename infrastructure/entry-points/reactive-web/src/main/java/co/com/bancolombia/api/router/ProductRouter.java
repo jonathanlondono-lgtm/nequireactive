@@ -20,6 +20,8 @@ public class ProductRouter {
                         RouterFunctions.route(POST(""), handler::addProduct)
                                 .andRoute(DELETE(""), handler::deleteProduct)
                                 .andRoute(PUT("/stock"), handler::updateProductStock)
+                                .andRoute(PUT("/name"), handler::updateProductName)
+
                 );
     }
 }

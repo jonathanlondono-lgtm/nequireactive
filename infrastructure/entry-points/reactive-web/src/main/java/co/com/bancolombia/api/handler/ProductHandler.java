@@ -2,7 +2,9 @@ package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.dto.request.DeleteProductRequest;
 import co.com.bancolombia.api.dto.request.ProductRequest;
+import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
+import co.com.bancolombia.api.dto.response.UpdateProductNameResponse;
 import co.com.bancolombia.api.dto.response.UpdateStockResponse;
 import co.com.bancolombia.usecase.franchiseusecase.ProductUseCase;
 import jakarta.validation.Validator;
@@ -51,6 +53,22 @@ public class ProductHandler {
                                         product.getId(),
                                         product.getName(),
                                         product.getStock()
+                                ))
+                                .flatMap(response ->
+                                        ServerResponse.status(HttpStatus.OK)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .bodyValue(response)
+                                )
+                );
+    }
+
+    public Mono<ServerResponse> updateProductName(ServerRequest request) {
+        return request.bodyToMono(UpdateProductNameRequest.class)
+                .flatMap(dto ->
+                        productUseCase.updateProductName(dto.getProductId(), dto.getNewName())
+                                .map(product -> new UpdateProductNameResponse(
+                                        product.getId(),
+                                        product.getName()
                                 ))
                                 .flatMap(response ->
                                         ServerResponse.status(HttpStatus.OK)

@@ -1,6 +1,7 @@
 package co.com.bancolombia.r2dbc.repository;
 
 import co.com.bancolombia.r2dbc.entity.ProductEntity;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -17,5 +18,9 @@ public interface ProductReactiveRepository extends ReactiveCrudRepository<Produc
 
     @Query("SELECT * FROM product WHERE branch_id = $1 ORDER BY stock DESC LIMIT 1")
     Mono<ProductEntity> findTopByBranchIdOrderByStockDesc(UUID branchId);
+
+    @Modifying
+    @Query("UPDATE product SET name = $1, updated_at = now() WHERE id = $2")
+    Mono<Integer> updateProductName(String name, UUID id);
 
 }

@@ -5,11 +5,8 @@ import co.com.bancolombia.model.product.gateways.ProductRepository;
 import co.com.bancolombia.r2dbc.entity.ProductEntity;
 import co.com.bancolombia.r2dbc.mapper.ProductMapper;
 import co.com.bancolombia.r2dbc.repository.ProductReactiveRepository;
-import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import lombok.RequiredArgsConstructor;
-import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -48,6 +45,12 @@ public class ProductAdapter implements ProductRepository {
                     return productRepository.save(entity);
                 })
                 .map(ProductMapper::toDomain);    }
+
+    @Override
+    public Mono<Product> updateProduct(Product product) {
+        return productRepository.updateProductName(product.getName(), product.getId())
+                .thenReturn(product);
+    }
 
     @Override
     public Mono<Product> findProductWithHighestStockByBranchId(UUID branchId) {
