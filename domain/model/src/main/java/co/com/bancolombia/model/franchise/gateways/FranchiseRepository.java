@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface FranchiseRepository {
     Mono<Franchise> saveFranchise(Franchise franchise);
     Mono<Franchise> getFranchiseByBranchId(UUID branchId);
+    Mono<Franchise> updateFranchise(Franchise franchise);
 
 
     Mono<Franchise> getFranchiseByName(String name);

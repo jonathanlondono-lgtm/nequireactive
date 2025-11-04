@@ -44,6 +44,11 @@ public class FranchiseAdapter implements FranchiseRepository {
                 );
     }
 
+    @Override
+    public Mono<Franchise> updateFranchise(Franchise franchise) {
+        return repository.save(FranchiseMapper.toEntity(franchise))
+                .map(FranchiseMapper::toDomain);    }
+
 
     @Override
     public Mono<Franchise> getFranchiseByName(String name) {
