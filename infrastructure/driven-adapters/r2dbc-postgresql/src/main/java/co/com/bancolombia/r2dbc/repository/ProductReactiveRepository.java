@@ -15,4 +15,7 @@ public interface ProductReactiveRepository extends ReactiveCrudRepository<Produc
     @Query("DELETE FROM product WHERE id = $1")
     Mono<Void> deleteById(UUID id);
 
+    @Query("SELECT * FROM product WHERE branch_id = $1 ORDER BY stock DESC LIMIT 1")
+    Mono<ProductEntity> findTopByBranchIdOrderByStockDesc(UUID branchId);
+
 }

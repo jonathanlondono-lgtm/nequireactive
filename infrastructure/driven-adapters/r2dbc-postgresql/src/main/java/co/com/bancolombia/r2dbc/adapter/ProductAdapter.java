@@ -48,4 +48,9 @@ public class ProductAdapter implements ProductRepository {
                     return productRepository.save(entity);
                 })
                 .map(ProductMapper::toDomain);    }
+
+    @Override
+    public Mono<Product> findProductWithHighestStockByBranchId(UUID branchId) {
+        return productRepository.findTopByBranchIdOrderByStockDesc(branchId)
+                .map(ProductMapper::toDomain);    }
 }

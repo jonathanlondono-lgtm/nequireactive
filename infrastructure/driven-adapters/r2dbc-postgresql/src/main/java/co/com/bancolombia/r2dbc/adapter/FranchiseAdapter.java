@@ -9,7 +9,6 @@ import co.com.bancolombia.r2dbc.repository.BranchReactiveRepository;
 import co.com.bancolombia.r2dbc.repository.FranchiseReactiveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -53,6 +52,6 @@ public class FranchiseAdapter implements FranchiseRepository {
 
     @Override
     public Mono<Franchise> getFranchiseById(UUID id) {
-        return null;
-    }
+        return repository.findById(id)
+                .map(FranchiseMapper::toDomain);    }
 }
