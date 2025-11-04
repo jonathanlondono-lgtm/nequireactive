@@ -1,6 +1,8 @@
 package co.com.bancolombia.usecase.franchiseusecase;
 
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
+import co.com.bancolombia.model.enums.DomainExceptionMessage;
+import co.com.bancolombia.model.exception.FranchiseException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
@@ -38,5 +40,16 @@ public class FranchiseUseCase {
                                         product.getStock()
                                 ))
                 );
+    }
+
+    public Mono<Franchise> updateFranchiseName(UUID franchiseId, String newName) {
+        return franchiseRepository.getFranchiseById(franchiseId)
+                .switchIfEmpty(Mono.error(
+                        new FranchiseException(DomainExceptionMessage.FRANCHISE_NOT_FOUND, franchiseId.toString())
+                ))
+                .flatMap(franchise -> {
+                    franchise.rename(newName);
+                    return franchiseRepository.updateFranchise(franchise);
+                });
     }
 }

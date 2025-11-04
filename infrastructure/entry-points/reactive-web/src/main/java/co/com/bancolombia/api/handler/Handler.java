@@ -2,7 +2,9 @@ package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.dto.request.FranchiseDTO;
 import co.com.bancolombia.api.dto.request.MaxStockByFranchiseRequest;
+import co.com.bancolombia.api.dto.request.UpdateFranchiseNameRequest;
 import co.com.bancolombia.api.dto.response.MaxStockByBranchResponse;
+import co.com.bancolombia.api.dto.response.UpdateFranchiseNameResponse;
 import co.com.bancolombia.usecase.franchiseusecase.FranchiseUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,6 +29,16 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(useCase.getProductsWithHighestStockByFranchise(dto.getFranchiseId()), MaxStockByBranchResponse.class)
+                );
+    }
+
+    public Mono<ServerResponse> updateFranchiseName(ServerRequest request) {
+        return request.bodyToMono(UpdateFranchiseNameRequest.class)
+                .flatMap(dto -> useCase.updateFranchiseName(dto.getFranchiseId(), dto.getNewName()))
+                .map(franchise -> new UpdateFranchiseNameResponse(franchise.getId(), franchise.getName()))
+                .flatMap(response -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(response)
                 );
     }
 
