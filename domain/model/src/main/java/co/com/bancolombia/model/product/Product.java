@@ -64,6 +64,9 @@ public class Product {
     }
 
     public void updateStock(int newStock) {
+        if (id == null) {
+            throw new ProductException(DomainExceptionMessage.PRODUCT_ID_REQUIRED);
+        }
         if (newStock < 0) {
             throw new ProductException(DomainExceptionMessage.PRODUCT_STOCK_NON_NEGATIVE);
         }

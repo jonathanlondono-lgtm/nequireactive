@@ -39,4 +39,13 @@ public class ProductAdapter implements ProductRepository {
     public Mono<Void> deleteById(UUID productId) {
         return productRepository.deleteById(productId);
     }
+
+    @Override
+    public Mono<Product> updateProduct(UUID productId, int newStock) {
+        return productRepository.findById(productId.toString())
+                .flatMap(entity -> {
+                    entity.setStock(newStock);
+                    return productRepository.save(entity);
+                })
+                .map(ProductMapper::toDomain);    }
 }

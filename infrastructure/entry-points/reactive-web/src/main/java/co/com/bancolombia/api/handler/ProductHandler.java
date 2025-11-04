@@ -2,11 +2,14 @@ package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.dto.request.DeleteProductRequest;
 import co.com.bancolombia.api.dto.request.ProductRequest;
+import co.com.bancolombia.api.dto.request.UpdateStockRequest;
+import co.com.bancolombia.api.dto.response.UpdateStockResponse;
 import co.com.bancolombia.model.exception.BranchException;
 import co.com.bancolombia.usecase.franchiseusecase.ProductUseCase;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -38,6 +41,23 @@ public class ProductHandler {
                 .flatMap(dto ->
                         productUseCase.execute(dto.getBranchId(), dto.getProductId())
                                 .then(ServerResponse.noContent().build())
+                );
+    }
+
+    public Mono<ServerResponse> updateProductStock(ServerRequest request) {
+        return request.bodyToMono(UpdateStockRequest.class)
+                .flatMap(dto ->
+                        productUseCase.execute(dto.getProductId(), dto.getNewStock())
+                                .map(product -> new UpdateStockResponse(
+                                        product.getId(),
+                                        product.getName(),
+                                        product.getStock()
+                                ))
+                                .flatMap(response ->
+                                        ServerResponse.status(HttpStatus.OK)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .bodyValue(response)
+                                )
                 );
     }
 }
