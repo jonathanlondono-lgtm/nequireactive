@@ -5,6 +5,7 @@ public enum DomainExceptionMessage implements IExceptionMessage {
     PRODUCT_STOCK_NON_NEGATIVE("Stock must be non-negative"),
     PRODUCT_REQUIRED("Product is required"),
     PRODUCT_NOT_FOUND("Product not found: %s"),
+    PRODUCT_ID_REQUIRED("Product ID is required"),
 
     BRANCH_NAME_REQUIRED("Branch name is required"),
     BRANCH_ID_REQUIRED("Branch ID is required"),

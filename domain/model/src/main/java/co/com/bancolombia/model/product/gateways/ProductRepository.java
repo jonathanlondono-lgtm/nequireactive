@@ -10,6 +10,8 @@ public interface ProductRepository {
     Mono<Void> addProductToBranch(UUID branchId, Product product);
     Mono<Product> findById(String productId);
     Mono<Void> deleteById(UUID productId);
+    Mono<Product> updateProduct(UUID productId, int newStock);
+
 
 
 

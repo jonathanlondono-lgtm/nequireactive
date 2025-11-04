@@ -2,6 +2,7 @@ package co.com.bancolombia.usecase.franchiseusecase;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
 import co.com.bancolombia.model.enums.DomainExceptionMessage;
 import co.com.bancolombia.model.exception.BranchException;
+import co.com.bancolombia.model.exception.ProductException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,19 @@ public class ProductUseCase {
                                 .then(productRepository.deleteById(productId))
                 );
     }
+
+    public Mono<Product> execute(UUID productId, int newStock) {
+        return productRepository.findById(productId.toString())
+                .switchIfEmpty(Mono.error(
+                        new ProductException(DomainExceptionMessage.PRODUCT_NOT_FOUND, productId.toString())
+                ))
+                .flatMap(product -> {
+                    product.updateStock(newStock);
+                    return productRepository.updateProduct(productId, newStock);
+                });
+    }
+
+
 
 
 }
