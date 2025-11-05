@@ -6,7 +6,7 @@ import co.com.bancolombia.model.exception.FranchiseException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
-import co.com.bancolombia.usecase.dto.MaxStockByBranchResponse;
+import co.com.bancolombia.usecase.dto.MaxStockByBranch;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,13 +26,13 @@ public class FranchiseUseCase {
         return franchiseRepository.saveFranchise(franchise);
     }
 
-    public Flux<MaxStockByBranchResponse> getProductsWithHighestStockByFranchise(UUID franchiseId) {
+    public Flux<MaxStockByBranch> getProductsWithHighestStockByFranchise(UUID franchiseId) {
         return franchiseRepository.getFranchiseById(franchiseId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
                 .flatMapMany(franchise -> branchRepository.findAllByFranchiseId(franchise.getId()))
                 .flatMap(branch ->
                         productRepository.findProductWithHighestStockByBranchId(branch.getId())
-                                .map(product -> new MaxStockByBranchResponse(
+                                .map(product -> new MaxStockByBranch(
                                         branch.getId(),
                                         branch.getName(),
                                         product.getId(),

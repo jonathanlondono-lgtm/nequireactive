@@ -28,7 +28,14 @@ public class Handler {
         return request.bodyToMono(MaxStockByFranchiseRequest.class)
                 .flatMap(dto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(useCase.getProductsWithHighestStockByFranchise(dto.getFranchiseId()), MaxStockByBranchResponse.class)
+                        .body(useCase.getProductsWithHighestStockByFranchise(dto.getFranchiseId())
+                                .map(domainDto -> new MaxStockByBranchResponse(
+                                        domainDto.getBranchId(),
+                                        domainDto.getBranchName(),
+                                        domainDto.getProductId(),
+                                        domainDto.getProductName(),
+                                        domainDto.getStock()
+                                )), MaxStockByBranchResponse.class)
                 );
     }
 
@@ -41,5 +48,4 @@ public class Handler {
                         .bodyValue(response)
                 );
     }
-
 }

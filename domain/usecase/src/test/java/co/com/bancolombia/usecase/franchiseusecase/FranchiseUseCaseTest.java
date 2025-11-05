@@ -7,7 +7,7 @@ import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
-import co.com.bancolombia.usecase.dto.MaxStockByBranchResponse;
+import co.com.bancolombia.usecase.dto.MaxStockByBranch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,6 @@ import reactor.test.StepVerifier;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,7 +106,7 @@ class FranchiseUseCaseTest {
                 .thenReturn(Mono.just(product));
 
         // Act
-        Flux<MaxStockByBranchResponse> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
+        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
 
         // Assert
         StepVerifier.create(result)
@@ -132,7 +131,7 @@ class FranchiseUseCaseTest {
                 .thenReturn(Mono.empty());
 
         // Act
-        Flux<MaxStockByBranchResponse> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
+        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
 
         // Assert
         StepVerifier.create(result)
@@ -156,7 +155,7 @@ class FranchiseUseCaseTest {
                 .thenReturn(Flux.empty());
 
         // Act
-        Flux<MaxStockByBranchResponse> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
+        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
 
         // Assert
         StepVerifier.create(result)
@@ -182,7 +181,7 @@ class FranchiseUseCaseTest {
                 .thenReturn(Mono.empty());
 
         // Act
-        Flux<MaxStockByBranchResponse> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
+        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
 
         // Assert
         StepVerifier.create(result)

@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MaxStockByBranchResponse {
+public class MaxStockByBranch {
     private UUID branchId;
     private String branchName;
     private UUID productId;
