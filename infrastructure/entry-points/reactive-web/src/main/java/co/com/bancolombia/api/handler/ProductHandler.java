@@ -6,8 +6,8 @@ import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
 import co.com.bancolombia.api.dto.response.UpdateProductNameResponse;
 import co.com.bancolombia.api.dto.response.UpdateStockResponse;
+import co.com.bancolombia.api.validator.RequestValidator;
 import co.com.bancolombia.usecase.franchiseusecase.ProductUseCase;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,60 +21,55 @@ import reactor.core.publisher.Mono;
 public class ProductHandler {
 
     private final ProductUseCase productUseCase;
-    private final Validator validator;
+    private final RequestValidator validator;
 
     public Mono<ServerResponse> addProduct(ServerRequest request) {
         return request.bodyToMono(ProductRequest.class)
-                .flatMap(dto -> {
-                    var violations = validator.validate(dto);
-                    if (!violations.isEmpty()) {
-                        return ServerResponse.badRequest().bodyValue(violations);
-                    }
-
-                    return productUseCase.execute(dto.getBranchId(), dto.getName(), dto.getStock())
-                            .then(ServerResponse.status(HttpStatus.CREATED).build());
-
-
-                });
+                .flatMap(validator::validate)
+                .flatMap(dto -> productUseCase.execute(dto.getBranchId(), dto.getName(), dto.getStock())
+                        .then(ServerResponse.status(HttpStatus.CREATED).build())
+                );
     }
+
     public Mono<ServerResponse> deleteProduct(ServerRequest request) {
         return request.bodyToMono(DeleteProductRequest.class)
-                .flatMap(dto ->
-                        productUseCase.execute(dto.getBranchId(), dto.getProductId())
-                                .then(ServerResponse.noContent().build())
+                .flatMap(validator::validate)
+                .flatMap(dto -> productUseCase.execute(dto.getBranchId(), dto.getProductId())
+                        .then(ServerResponse.noContent().build())
                 );
     }
 
     public Mono<ServerResponse> updateProductStock(ServerRequest request) {
         return request.bodyToMono(UpdateStockRequest.class)
-                .flatMap(dto ->
-                        productUseCase.execute(dto.getProductId(), dto.getNewStock())
-                                .map(product -> new UpdateStockResponse(
-                                        product.getId(),
-                                        product.getName(),
-                                        product.getStock()
-                                ))
-                                .flatMap(response ->
-                                        ServerResponse.status(HttpStatus.OK)
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .bodyValue(response)
-                                )
+                .flatMap(validator::validate)
+                .flatMap(dto -> productUseCase.execute(dto.getProductId(), dto.getNewStock())
+                        .map(product -> new UpdateStockResponse(
+                                product.getId(),
+                                product.getName(),
+                                product.getStock()
+                        ))
+                        .flatMap(response ->
+                                ServerResponse.status(HttpStatus.OK)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(response)
+                        )
                 );
     }
 
     public Mono<ServerResponse> updateProductName(ServerRequest request) {
         return request.bodyToMono(UpdateProductNameRequest.class)
-                .flatMap(dto ->
-                        productUseCase.updateProductName(dto.getProductId(), dto.getNewName())
-                                .map(product -> new UpdateProductNameResponse(
-                                        product.getId(),
-                                        product.getName()
-                                ))
-                                .flatMap(response ->
-                                        ServerResponse.status(HttpStatus.OK)
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .bodyValue(response)
-                                )
+                .flatMap(validator::validate)
+                .flatMap(dto -> productUseCase.updateProductName(dto.getProductId(), dto.getNewName())
+                        .map(product -> new UpdateProductNameResponse(
+                                product.getId(),
+                                product.getName()
+                        ))
+                        .flatMap(response ->
+                                ServerResponse.status(HttpStatus.OK)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(response)
+                        )
                 );
     }
 }
+
