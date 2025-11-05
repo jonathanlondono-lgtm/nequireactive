@@ -4,11 +4,13 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -23,16 +25,10 @@ public class RequestValidator {
             return Mono.just(object);
         }
 
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(object, object.getClass().getName());
-        violations.forEach(violation ->
-            bindingResult.rejectValue(
-                violation.getPropertyPath().toString(),
-                violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName(),
-                violation.getMessage()
-            )
-        );
+        String errorMessage = violations.stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining(", "));
 
-        return Mono.error(new WebExchangeBindException(null, bindingResult));
+        return Mono.error(new ServerWebInputException("Validation failed: " + errorMessage));
     }
 }
-
