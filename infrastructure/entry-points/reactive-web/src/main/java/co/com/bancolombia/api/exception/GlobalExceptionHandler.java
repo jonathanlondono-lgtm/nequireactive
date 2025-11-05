@@ -26,10 +26,9 @@ import reactor.core.publisher.Mono;
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
     public GlobalExceptionHandler(ErrorAttributes errorAttributes,
-                                   WebProperties.Resources resources,
                                    ApplicationContext applicationContext,
                                    ServerCodecConfigurer serverCodecConfigurer) {
-        super(errorAttributes, resources, applicationContext);
+        super(errorAttributes, new WebProperties.Resources(), applicationContext);
         this.setMessageWriters(serverCodecConfigurer.getWriters());
     }
 
@@ -44,18 +43,22 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
         log.error("Error handling request to path: {} - Error: {}", path, error.getMessage(), error);
 
+        // Manejar excepciones de dominio (ApiException y sus hijas)
         if (error instanceof ApiException apiException) {
             return handleDomainException(apiException, path);
         }
 
+        // Manejar errores de validación (ServerWebInputException del RequestValidator)
         if (error instanceof ServerWebInputException inputException) {
             return handleValidationException(inputException, path);
         }
 
+        // Manejar IllegalArgumentException
         if (error instanceof IllegalArgumentException illegalArgException) {
             return handleIllegalArgumentException(illegalArgException, path);
         }
 
+        // Manejar cualquier otra excepción no contemplada
         return handleGenericException(error, path);
     }
 
@@ -92,6 +95,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse> handleValidationException(ServerWebInputException exception, String path) {
+        // Extraer el mensaje de validación del ServerWebInputException
         String errorMessage = exception.getReason() != null ?
                 exception.getReason() :
                 "Validation failed";
