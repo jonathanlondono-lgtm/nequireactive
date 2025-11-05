@@ -1,7 +1,11 @@
 resource "random_password" "db_password" {
   length           = var.password_length
   special          = true
-  override_special = "_%@"
+  override_special = "!#%&*()-_=+?."
+  min_special      = 1
+  min_upper        = 1
+  min_lower        = 1
+  min_numeric      = 1
 }
 
 resource "aws_secretsmanager_secret" "db_secret" {
