@@ -4,9 +4,9 @@ server:
 spring:
   flyway:
     enabled: true
-    url: jdbc:postgresql://localhost:5432/bootcamp_default
-    user: bootcampuser
-    password: bootcamppass
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:bootcamp_default}
+    user: ${DB_USERNAME:bootcampuser}
+    password: ${DB_PASSWORD:bootcamppass}
     locations: classpath:db/migration
     baseline-on-migrate: true
 
@@ -20,6 +20,7 @@ spring:
       path: "/h2"
   profiles:
     include: null
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -29,13 +30,12 @@ springdoc:
 
 adapters:
   r2dbc:
-    host: localhost
+    host: ${DB_HOST:localhost}
     port: 5432
-    database: bootcamp_default
+    database: ${DB_NAME:bootcamp_default}
     schema: public
-    username: bootcampuser
-    password: bootcamppass
-
+    username: ${DB_USERNAME:bootcampuser}
+    password: ${DB_PASSWORD:bootcamppass}
 
 management:
   endpoints:
