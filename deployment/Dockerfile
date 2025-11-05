@@ -10,9 +10,9 @@ COPY *.jar retoreactivo.jar
 # Dar permisos al usuario appuser
 RUN chown appuser:appgroup retoreactivo.jar
 
-ENV JAVA_OPTS=" -Xshareclasses:name=cacheapp,cacheDir=/cache,nonfatal -XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
 
 # Cambiar a usuario no-root
 USER appuser
 
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS  -jar retoreactivo.jar" ]
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar retoreactivo.jar" ]
