@@ -87,21 +87,21 @@ jobs:
       - name: Extract metadata for Docker
         id: meta
         run: |
-          echo "tags=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "latest=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest" >> $GITHUB_OUTPUT
+          echo "tags=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest" >> $GITHUB_OUTPUT
+          echo "commit-tag=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         id: build-image
         working-directory: deployment
         run: |
           docker build -t ${{ steps.meta.outputs.tags }} .
-          docker tag ${{ steps.meta.outputs.tags }} ${{ steps.meta.outputs.latest }}
+          docker tag ${{ steps.meta.outputs.tags }} ${{ steps.meta.outputs.commit-tag }}
           echo "digest=$(docker images --digests ${{ steps.meta.outputs.tags }} --format '{{.Digest}}')" >> $GITHUB_OUTPUT
 
       - name: Push Docker image to ECR
         run: |
           docker push ${{ steps.meta.outputs.tags }}
-          docker push ${{ steps.meta.outputs.latest }}
+          docker push ${{ steps.meta.outputs.commit-tag }}
 
       - name: Image details
         run: |
