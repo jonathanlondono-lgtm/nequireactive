@@ -24,7 +24,7 @@ public class BranchAdapter implements BranchRepository {
     private final BranchReactiveRepository branchRepository;
 
     @Override
-    public Mono<Void> addBranchToFranchise(UUID franchiseId, String branchName) {
+    public Mono<Branch> addBranchToFranchise(UUID franchiseId, String branchName) {
         return franchiseRepository.findById(franchiseId)
                 .map(FranchiseMapper::toDomain)
                 .flatMap(franchise -> {
@@ -34,7 +34,7 @@ public class BranchAdapter implements BranchRepository {
                     UUID branchId = newBranch.getId();
 
                     return branchRepository.insertBranch(branchId, franchiseId, branchName)
-                            .then();
+                            .thenReturn(newBranch);
                 });
     }
 

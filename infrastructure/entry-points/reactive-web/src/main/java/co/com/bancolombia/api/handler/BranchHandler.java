@@ -2,6 +2,7 @@ package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.dto.request.BranchDTO;
 import co.com.bancolombia.api.dto.request.UpdateBranchNameRequest;
+import co.com.bancolombia.api.dto.response.CreateBranchResponse;
 import co.com.bancolombia.api.dto.response.UpdateBranchNameResponse;
 import co.com.bancolombia.api.validator.RequestValidator;
 import co.com.bancolombia.usecase.franchiseusecase.BranchUseCase;
@@ -25,7 +26,10 @@ public class BranchHandler {
         return request.bodyToMono(BranchDTO.class)
                 .flatMap(validator::validate)
                 .flatMap(body -> useCase.execute(franchiseId, body.getName()))
-                .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+                .map(branch -> new CreateBranchResponse(branch.getId(), branch.getName()))
+                .flatMap(response -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(response));
     }
 
     public Mono<ServerResponse> updateBranchName(ServerRequest request) {

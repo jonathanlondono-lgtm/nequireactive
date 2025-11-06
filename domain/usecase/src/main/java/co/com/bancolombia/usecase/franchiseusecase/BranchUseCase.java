@@ -13,7 +13,7 @@ import java.util.UUID;
 public class BranchUseCase {
     private final BranchRepository branchRepository;
 
-    public Mono<Void> execute(UUID franchiseId, String branchName) {
+    public Mono<Branch> execute(UUID franchiseId, String branchName) {
         return branchRepository.addBranchToFranchise(franchiseId, branchName);
     }
 

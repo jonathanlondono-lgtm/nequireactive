@@ -43,14 +43,16 @@ class BranchUseCaseTest {
     @DisplayName("Should add branch to franchise successfully")
     void shouldAddBranchToFranchiseSuccessfully() {
         // Arrange
+        Branch newBranch = Branch.create("New Branch");
         when(branchRepository.addBranchToFranchise(franchiseId, "New Branch"))
-                .thenReturn(Mono.empty());
+                .thenReturn(Mono.just(newBranch));
 
         // Act
-        Mono<Void> result = branchUseCase.execute(franchiseId, "New Branch");
+        Mono<Branch> result = branchUseCase.execute(franchiseId, "New Branch");
 
         // Assert
         StepVerifier.create(result)
+                .expectNextMatches(b -> b.getName().equals("New Branch"))
                 .verifyComplete();
 
         verify(branchRepository).addBranchToFranchise(franchiseId, "New Branch");
@@ -64,7 +66,7 @@ class BranchUseCaseTest {
                 .thenReturn(Mono.error(new RuntimeException("Repository error")));
 
         // Act
-        Mono<Void> result = branchUseCase.execute(franchiseId, "New Branch");
+        Mono<Branch> result = branchUseCase.execute(franchiseId, "New Branch");
 
         // Assert
         StepVerifier.create(result)
@@ -160,4 +162,3 @@ class BranchUseCaseTest {
         verify(branchRepository, never()).updateBranch(any());
     }
 }
-

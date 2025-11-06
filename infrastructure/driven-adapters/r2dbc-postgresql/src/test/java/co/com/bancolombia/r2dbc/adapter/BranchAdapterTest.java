@@ -66,10 +66,11 @@ class BranchAdapterTest {
                 .thenReturn(Mono.empty());
 
         // Act
-        Mono<Void> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
+        Mono<Branch> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
 
         // Assert
         StepVerifier.create(result)
+                .expectNextMatches(branch -> branch.getName().equals("New Branch") && branch.getId() != null)
                 .verifyComplete();
 
         verify(franchiseRepository).findById(franchiseId);
@@ -84,7 +85,7 @@ class BranchAdapterTest {
                 .thenReturn(Mono.empty());
 
         // Act
-        Mono<Void> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
+        Mono<Branch> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
 
         // Assert
         StepVerifier.create(result)
@@ -211,4 +212,3 @@ class BranchAdapterTest {
         verify(branchRepository).updateBranchName("Updated Branch", branchId);
     }
 }
-
