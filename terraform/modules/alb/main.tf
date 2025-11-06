@@ -52,6 +52,9 @@ resource "aws_lb_target_group" "app" {
     path                = "/actuator/health"
     healthy_threshold   = 2
     unhealthy_threshold = 10
+    interval            = 30
+    timeout             = 10
+    matcher             = "200"
   }
 
   tags = {

@@ -1,5 +1,8 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
+
+# Instalar curl para health checks
+RUN apk add --no-cache curl
 
 # Crear usuario no-root para seguridad
 RUN addgroup -g 1001 appgroup && \
