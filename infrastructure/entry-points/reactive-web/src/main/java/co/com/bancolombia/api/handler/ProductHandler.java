@@ -4,6 +4,7 @@ import co.com.bancolombia.api.dto.request.DeleteProductRequest;
 import co.com.bancolombia.api.dto.request.ProductRequest;
 import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
+import co.com.bancolombia.api.dto.response.CreateProductResponse;
 import co.com.bancolombia.api.dto.response.UpdateProductNameResponse;
 import co.com.bancolombia.api.dto.response.UpdateStockResponse;
 import co.com.bancolombia.api.validator.RequestValidator;
@@ -27,7 +28,17 @@ public class ProductHandler {
         return request.bodyToMono(ProductRequest.class)
                 .flatMap(validator::validate)
                 .flatMap(dto -> productUseCase.execute(dto.getBranchId(), dto.getName(), dto.getStock())
-                        .then(ServerResponse.status(HttpStatus.CREATED).build())
+                        .map(product -> new CreateProductResponse(
+                                product.getId(),
+                                product.getName(),
+                                product.getStock(),
+                                dto.getBranchId()
+                        ))
+                        .flatMap(response ->
+                                ServerResponse.status(HttpStatus.CREATED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(response)
+                        )
                 );
     }
 
@@ -72,4 +83,3 @@ public class ProductHandler {
                 );
     }
 }
-

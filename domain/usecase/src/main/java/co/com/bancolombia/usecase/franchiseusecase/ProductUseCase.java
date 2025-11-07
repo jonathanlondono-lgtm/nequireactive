@@ -16,7 +16,7 @@ public class ProductUseCase {
     private final BranchRepository branchRepository;
     private final ProductRepository productRepository;
 
-    public Mono<Void> execute(UUID branchId, String productName, int stock) {
+    public Mono<Product> execute(UUID branchId, String productName, int stock) {
         return branchRepository.findById(branchId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Branch not found")))
                 .flatMap(branch -> {

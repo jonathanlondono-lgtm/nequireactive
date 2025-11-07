@@ -18,14 +18,15 @@ public class ProductAdapter implements ProductRepository {
     private final ProductReactiveRepository productRepository;
 
     @Override
-    public Mono<Void> addProductToBranch(UUID branchId,Product product) {
+    public Mono<Product> addProductToBranch(UUID branchId, Product product) {
         ProductEntity entity = ProductMapper.toEntity(product, branchId);
         return productRepository.insertProduct(
                 entity.getId(),
                 entity.getBranchId(),
                 entity.getName(),
                 entity.getStock()
-        );    }
+        ).thenReturn(product);
+    }
 
     @Override
     public Mono<Product> findById(String productId) {
