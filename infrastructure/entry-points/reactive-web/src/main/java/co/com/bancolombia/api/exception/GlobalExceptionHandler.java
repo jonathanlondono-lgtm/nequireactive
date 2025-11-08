@@ -1,10 +1,8 @@
 package co.com.bancolombia.api.exception;
 
 import co.com.bancolombia.api.dto.response.ErrorResponse;
-import co.com.bancolombia.model.exception.ApiException;
-import co.com.bancolombia.model.exception.BranchException;
-import co.com.bancolombia.model.exception.FranchiseException;
-import co.com.bancolombia.model.exception.ProductException;
+import co.com.bancolombia.model.exception.BusinessException;
+import co.com.bancolombia.model.exception.TechnicalException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -17,7 +15,6 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -43,36 +40,29 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
         log.error("Error handling request to path: {} - Error: {}", path, error.getMessage(), error);
 
-        // Manejar excepciones de dominio (ApiException y sus hijas)
-        if (error instanceof ApiException apiException) {
-            return handleDomainException(apiException, path);
+        if (error instanceof BusinessException businessException) {
+            return handleBusinessException(businessException, path);
         }
 
-        // Manejar errores de validación (ServerWebInputException del RequestValidator)
-        if (error instanceof ServerWebInputException inputException) {
-            return handleValidationException(inputException, path);
+        if (error instanceof TechnicalException technicalException) {
+            return handleTechnicalException(technicalException, path);
         }
 
-        // Manejar IllegalArgumentException
-        if (error instanceof IllegalArgumentException illegalArgException) {
-            return handleIllegalArgumentException(illegalArgException, path);
-        }
-
-        // Manejar cualquier otra excepción no contemplada
         return handleGenericException(error, path);
     }
 
-    private Mono<ServerResponse> handleDomainException(ApiException exception, String path) {
-        HttpStatus status = determineDomainExceptionStatus(exception);
+    private Mono<ServerResponse> handleBusinessException(BusinessException exception, String path) {
+        HttpStatus status = HttpStatus.valueOf(Integer.parseInt(exception.getTechnicalMessage().getCode()));
 
         ErrorResponse errorResponse = ErrorResponse.of(
                 status.value(),
-                status.getReasonPhrase(),
+                exception.getTechnicalMessage().getCode(),
                 exception.getMessage(),
                 path
         );
 
-        log.warn("Domain exception occurred: {} - Status: {}", exception.getMessage(), status);
+        log.warn("Business exception occurred: {} - Status: {} - Code: {}",
+                exception.getMessage(), status, exception.getTechnicalMessage().getCode());
 
         return ServerResponse
                 .status(status)
@@ -80,53 +70,21 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                 .body(BodyInserters.fromValue(errorResponse));
     }
 
-    private HttpStatus determineDomainExceptionStatus(ApiException exception) {
-        if (exception.getMessage() != null && exception.getMessage().contains("not found")) {
-            return HttpStatus.NOT_FOUND;
-        }
-
-        if (exception instanceof ProductException ||
-            exception instanceof BranchException ||
-            exception instanceof FranchiseException) {
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        return HttpStatus.BAD_REQUEST;
-    }
-
-    private Mono<ServerResponse> handleValidationException(ServerWebInputException exception, String path) {
-        // Extraer el mensaje de validación del ServerWebInputException
-        String errorMessage = exception.getReason() != null ?
-                exception.getReason() :
-                "Validation failed";
+    private Mono<ServerResponse> handleTechnicalException(TechnicalException exception, String path) {
+        HttpStatus status = HttpStatus.valueOf(Integer.parseInt(exception.getTechnicalMessage().getCode()));
 
         ErrorResponse errorResponse = ErrorResponse.of(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                errorMessage,
-                path
-        );
-
-        log.warn("Validation exception occurred: {}", errorMessage);
-
-        return ServerResponse
-                .status(HttpStatus.BAD_REQUEST)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(errorResponse));
-    }
-
-    private Mono<ServerResponse> handleIllegalArgumentException(IllegalArgumentException exception, String path) {
-        ErrorResponse errorResponse = ErrorResponse.of(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                status.value(),
+                exception.getTechnicalMessage().getCode(),
                 exception.getMessage(),
                 path
         );
 
-        log.warn("Illegal argument exception occurred: {}", exception.getMessage());
+        log.error("Technical exception occurred: {} - Status: {} - Code: {}",
+                exception.getMessage(), status, exception.getTechnicalMessage().getCode(), exception);
 
         return ServerResponse
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(errorResponse));
     }
@@ -134,7 +92,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     private Mono<ServerResponse> handleGenericException(Throwable error, String path) {
         ErrorResponse errorResponse = ErrorResponse.of(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "500",
                 "An unexpected error occurred: " + error.getMessage(),
                 path
         );

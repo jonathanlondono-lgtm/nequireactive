@@ -1,6 +1,6 @@
 package co.com.bancolombia.api.router;
 
-import co.com.bancolombia.api.handler.Handler;
+import co.com.bancolombia.api.handler.FranchiseHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +27,7 @@ public class RouterRest {
             @RouterOperation(
                     path = "/api/franchise",
                     method = RequestMethod.POST,
-                    beanClass = Handler.class,
+                    beanClass = FranchiseHandler.class,
                     beanMethod = "createFranchise",
                     operation = @Operation(
                             tags = {"Franchise"},
@@ -49,7 +49,7 @@ public class RouterRest {
             @RouterOperation(
                     path = "/api/franchise/name",
                     method = RequestMethod.PUT,
-                    beanClass = Handler.class,
+                    beanClass = FranchiseHandler.class,
                     beanMethod = "updateFranchiseName",
                     operation = @Operation(
                             tags = {"Franchise"},
@@ -65,7 +65,7 @@ public class RouterRest {
                     )
             )
     })
-    public RouterFunction<ServerResponse> routerFunction(Handler handler) {
+    public RouterFunction<ServerResponse> routerFunction(FranchiseHandler handler) {
         return route(POST("/api/franchise"), handler::createFranchise)
                 .andRoute(PUT("/api/franchise/name"), handler::updateFranchiseName);
     }

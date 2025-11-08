@@ -1,6 +1,5 @@
 package co.com.bancolombia.model.exception;
 
-import co.com.bancolombia.model.enums.DomainExceptionMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

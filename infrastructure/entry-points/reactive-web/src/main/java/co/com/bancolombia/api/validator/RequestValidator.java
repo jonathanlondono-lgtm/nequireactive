@@ -1,12 +1,11 @@
 package co.com.bancolombia.api.validator;
 
+import co.com.bancolombia.model.enums.TechnicalMessage;
+import co.com.bancolombia.model.exception.BusinessException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
@@ -29,6 +28,9 @@ public class RequestValidator {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining(", "));
 
-        return Mono.error(new ServerWebInputException("Validation failed: " + errorMessage));
+        return Mono.error(new BusinessException(
+                TechnicalMessage.INVALID_PARAMETERS,
+                errorMessage
+        ));
     }
 }

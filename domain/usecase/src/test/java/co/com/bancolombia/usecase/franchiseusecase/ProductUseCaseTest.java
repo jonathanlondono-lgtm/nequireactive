@@ -2,8 +2,6 @@ package co.com.bancolombia.usecase.franchiseusecase;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
-import co.com.bancolombia.model.exception.BranchException;
-import co.com.bancolombia.model.exception.ProductException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.model.product.Product;

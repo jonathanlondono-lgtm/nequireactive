@@ -1,6 +1,5 @@
 package co.com.bancolombia.usecase.franchiseusecase;
 
-import co.com.bancolombia.model.exception.FranchiseException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import org.junit.jupiter.api.BeforeEach;
