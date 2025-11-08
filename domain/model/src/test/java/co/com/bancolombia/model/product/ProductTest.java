@@ -1,8 +1,5 @@
 package co.com.bancolombia.model.product;
 
-
-import co.com.bancolombia.model.enums.DomainExceptionMessage;
-import co.com.bancolombia.model.exception.ProductException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,121 +10,90 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductTest {
 
     @Test
-    @DisplayName("Should create product with valid data")
-    void shouldCreateProductWithValidData() {
+    @DisplayName("Should create product with builder")
+    void shouldCreateProductWithBuilder() {
         // Arrange & Act
-        Product product = Product.create("Laptop", 10);
+        Product product = Product.builder()
+                .name("Laptop")
+                .stock(10)
+                .branchId(UUID.randomUUID())
+                .build();
 
         // Assert
         assertNotNull(product);
-        assertNotNull(product.getId());
         assertEquals("Laptop", product.getName());
         assertEquals(10, product.getStock());
+        assertNotNull(product.getBranchId());
     }
 
     @Test
-    @DisplayName("Should throw exception when creating product with null name")
-    void shouldThrowExceptionWhenNameIsNull() {
-        // Act & Assert
-        ProductException exception = assertThrows(
-                ProductException.class,
-                () -> Product.create(null, 10)
-        );
-
-        assertEquals(DomainExceptionMessage.PRODUCT_NAME_REQUIRED.getMessage(),
-                exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when creating product with empty name")
-    void shouldThrowExceptionWhenNameIsEmpty() {
-        // Act & Assert
-        ProductException exception = assertThrows(
-                ProductException.class,
-                () -> Product.create("   ", 10)
-        );
-
-        assertEquals(DomainExceptionMessage.PRODUCT_NAME_REQUIRED.getMessage(),
-                exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when stock is negative")
-    void shouldThrowExceptionWhenStockIsNegative() {
-        // Act & Assert
-        ProductException exception = assertThrows(
-                ProductException.class,
-                () -> Product.create("Laptop", -5)
-        );
-
-        assertEquals(DomainExceptionMessage.PRODUCT_STOCK_NON_NEGATIVE.getMessage(),
-                exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should restore product with valid data")
-    void shouldRestoreProductWithValidData() {
+    @DisplayName("Should create product with id")
+    void shouldCreateProductWithId() {
         // Arrange
         UUID id = UUID.randomUUID();
+        UUID branchId = UUID.randomUUID();
 
         // Act
-        Product product = Product.restore(id, "Mouse", 20);
+        Product product = Product.builder()
+                .id(id)
+                .name("Mouse")
+                .stock(20)
+                .branchId(branchId)
+                .build();
 
         // Assert
         assertEquals(id, product.getId());
         assertEquals("Mouse", product.getName());
         assertEquals(20, product.getStock());
+        assertEquals(branchId, product.getBranchId());
     }
 
     @Test
-    @DisplayName("Should rename product successfully")
-    void shouldRenameProductSuccessfully() {
+    @DisplayName("Should allow modifying product name")
+    void shouldAllowModifyingProductName() {
         // Arrange
-        Product product = Product.create("Old Name", 5);
+        Product product = Product.builder()
+                .name("Old Name")
+                .stock(5)
+                .branchId(UUID.randomUUID())
+                .build();
 
         // Act
-        product.rename("New Name");
+        product.setName("New Name");
 
         // Assert
         assertEquals("New Name", product.getName());
     }
 
     @Test
-    @DisplayName("Should throw exception when renaming with null name")
-    void shouldThrowExceptionWhenRenamingWithNull() {
+    @DisplayName("Should allow modifying product stock")
+    void shouldAllowModifyingProductStock() {
         // Arrange
-        Product product = Product.create("Product", 5);
-
-        // Act & Assert
-        assertThrows(ProductException.class, () -> product.rename(null));
-    }
-
-    @Test
-    @DisplayName("Should update stock successfully")
-    void shouldUpdateStockSuccessfully() {
-        // Arrange
-        Product product = Product.create("Product", 10);
+        Product product = Product.builder()
+                .name("Product")
+                .stock(10)
+                .branchId(UUID.randomUUID())
+                .build();
 
         // Act
-        product.updateStock(25);
+        product.setStock(25);
 
         // Assert
         assertEquals(25, product.getStock());
     }
 
     @Test
-    @DisplayName("Should throw exception when updating stock with negative value")
-    void shouldThrowExceptionWhenUpdatingStockWithNegative() {
-        // Arrange
-        Product product = Product.create("Product", 10);
+    @DisplayName("Should allow zero stock")
+    void shouldAllowZeroStock() {
+        // Arrange & Act
+        Product product = Product.builder()
+                .name("Product")
+                .stock(0)
+                .branchId(UUID.randomUUID())
+                .build();
 
-        // Act & Assert
-        ProductException exception = assertThrows(
-                ProductException.class,
-                () -> product.updateStock(-5)
-        );
-
-        assertEquals(DomainExceptionMessage.PRODUCT_STOCK_NON_NEGATIVE.getMessage(),
-                exception.getMessage());
+        // Assert
+        assertEquals(0, product.getStock());
     }
 }
+

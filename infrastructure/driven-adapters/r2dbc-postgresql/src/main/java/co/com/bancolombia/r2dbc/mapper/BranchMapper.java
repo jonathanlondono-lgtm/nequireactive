@@ -1,43 +1,31 @@
 package co.com.bancolombia.r2dbc.mapper;
 
-
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.r2dbc.entity.BranchEntity;
 
-import java.util.UUID;
+import java.util.ArrayList;
 
 public final class BranchMapper {
 
     private BranchMapper() {}
 
-    public static Branch toDomain(BranchEntity e) {
-        if (e == null) return null;
-        return Branch.restore(e.getId(), e.getName());
-    }
-
-    public static BranchEntity toEntity(Branch b, UUID franchiseId) {
-        if (b == null) return null;
-        UUID id = b.getId() != null ? b.getId() : UUID.randomUUID();
-        return BranchEntity.builder()
-                .id(id)
-                .franchiseId(franchiseId)
-                .name(b.getName())
+    public static Branch toDomain(BranchEntity entity) {
+        if (entity == null) return null;
+        return Branch.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .franchiseId(entity.getFranchiseId())
+                .products(new ArrayList<>())
                 .build();
     }
 
-    public static BranchEntity toEntityWithoutFranchise(Branch b) {
-        if (b == null) return null;
+    public static BranchEntity toEntity(Branch branch) {
+        if (branch == null) return null;
         return BranchEntity.builder()
-                .id(b.getId() != null ? b.getId() : UUID.randomUUID())
-                .name(b.getName())
-                .build();
-    }
-
-    public static BranchEntity toNewEntity(String name, UUID franchiseId) {
-        return BranchEntity.builder()
-                .id(UUID.randomUUID())
-                .franchiseId(franchiseId)
-                .name(name)
+                .id(branch.getId())
+                .name(branch.getName())
+                .franchiseId(branch.getFranchiseId())
                 .build();
     }
 }
+

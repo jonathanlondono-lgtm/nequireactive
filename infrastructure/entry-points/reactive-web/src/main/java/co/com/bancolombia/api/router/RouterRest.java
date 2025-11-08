@@ -2,8 +2,6 @@ package co.com.bancolombia.api.router;
 
 import co.com.bancolombia.api.handler.Handler;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -49,24 +47,6 @@ public class RouterRest {
                     )
             ),
             @RouterOperation(
-                    path = "/api/franchise/max-stock",
-                    method = RequestMethod.POST,
-                    beanClass = Handler.class,
-                    beanMethod = "getMaxStockByFranchise",
-                    operation = @Operation(
-                            tags = {"Franchise"},
-                            summary = "Obtener productos con mayor stock por franquicia",
-                            operationId = "getMaxStockByFranchise",
-                            requestBody = @RequestBody(
-                                    required = true,
-                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.MaxStockByFranchiseRequest.class))
-                            ),
-                            responses = {
-                                    @ApiResponse(responseCode = "200", description = "Lista de productos con mayor stock")
-                            }
-                    )
-            ),
-            @RouterOperation(
                     path = "/api/franchise/name",
                     method = RequestMethod.PUT,
                     beanClass = Handler.class,
@@ -87,7 +67,7 @@ public class RouterRest {
     })
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/franchise"), handler::createFranchise)
-                .andRoute(POST("/api/franchise/max-stock"), handler::getMaxStockByFranchise)
                 .andRoute(PUT("/api/franchise/name"), handler::updateFranchiseName);
     }
 }
+

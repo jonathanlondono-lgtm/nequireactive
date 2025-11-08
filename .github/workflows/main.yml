@@ -146,7 +146,7 @@ jobs:
 
       - name: Deployment successful
         run: |
-          echo "✅ Deployment completed successfully!"
+          echo " Deployment completed successfully!"
           echo "Service: ${{ env.ECS_SERVICE }}"
           echo "Cluster: ${{ env.ECS_CLUSTER }}"
           echo "Image: ${{ needs.build-and-push-docker.outputs.image-tag }}"

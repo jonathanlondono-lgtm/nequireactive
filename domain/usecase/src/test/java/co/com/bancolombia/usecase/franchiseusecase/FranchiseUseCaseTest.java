@@ -1,13 +1,8 @@
 package co.com.bancolombia.usecase.franchiseusecase;
 
-import co.com.bancolombia.model.branch.Branch;
-import co.com.bancolombia.model.branch.gateways.BranchRepository;
 import co.com.bancolombia.model.exception.FranchiseException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
-import co.com.bancolombia.model.product.Product;
-import co.com.bancolombia.model.product.gateways.ProductRepository;
-import co.com.bancolombia.usecase.dto.MaxStockByBranch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -30,229 +25,101 @@ class FranchiseUseCaseTest {
     @Mock
     private FranchiseRepository franchiseRepository;
 
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
     @InjectMocks
     private FranchiseUseCase franchiseUseCase;
 
     private UUID franchiseId;
-    private UUID branchId;
     private Franchise franchise;
-    private Branch branch;
-    private Product product;
 
     @BeforeEach
     void setUp() {
         franchiseId = UUID.randomUUID();
-        branchId = UUID.randomUUID();
-        franchise = Franchise.create("KFC");
-        branch = Branch.create("Main Branch");
-        product = Product.create("Laptop", 50);
+        franchise = Franchise.builder()
+                .id(franchiseId)
+                .name("KFC")
+                .branches(new ArrayList<>())
+                .build();
     }
 
     @Test
     @DisplayName("Should create franchise successfully")
     void shouldCreateFranchiseSuccessfully() {
         // Arrange
-        when(franchiseRepository.saveFranchise(any(Franchise.class)))
-                .thenReturn(Mono.just(franchise));
+        Franchise newFranchise = Franchise.builder()
+                .name("McDonalds")
+                .branches(new ArrayList<>())
+                .build();
+
+        Franchise savedFranchise = Franchise.builder()
+                .id(UUID.randomUUID())
+                .name("McDonalds")
+                .branches(new ArrayList<>())
+                .build();
+
+        when(franchiseRepository.save(any(Franchise.class)))
+                .thenReturn(Mono.just(savedFranchise));
 
         // Act
-        Mono<Franchise> result = franchiseUseCase.createFranchise("KFC");
+        Mono<Franchise> result = franchiseUseCase.createFranchise(newFranchise);
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(f -> f.getName().equals("KFC"))
+                .expectNextMatches(f -> f.getName().equals("McDonalds") && f.getId() != null)
                 .verifyComplete();
 
-        verify(franchiseRepository).saveFranchise(any(Franchise.class));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when creating franchise with null name")
-    void shouldThrowExceptionWhenCreatingFranchiseWithNullName() {
-        // Act & Assert
-        StepVerifier.create(
-                Mono.defer(() -> {
-                    try {
-                        return franchiseUseCase.createFranchise(null);
-                    } catch (Exception e) {
-                        return Mono.error(e);
-                    }
-                })
-        )
-        .expectError(FranchiseException.class)
-        .verify();
-
-        verify(franchiseRepository, never()).saveFranchise(any());
-    }
-
-    @Test
-    @DisplayName("Should get products with highest stock by franchise")
-    void shouldGetProductsWithHighestStockByFranchise() {
-        // Arrange
-        Franchise franchiseWithId = Franchise.restore(franchiseId, "KFC");
-        Branch branchWithId = Branch.restore(branchId, "Main Branch");
-
-        when(franchiseRepository.getFranchiseById(franchiseId))
-                .thenReturn(Mono.just(franchiseWithId));
-        when(branchRepository.findAllByFranchiseId(franchiseId))
-                .thenReturn(Flux.just(branchWithId));
-        when(productRepository.findProductWithHighestStockByBranchId(branchId))
-                .thenReturn(Mono.just(product));
-
-        // Act
-        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectNextMatches(response ->
-                        response.getBranchId().equals(branchId) &&
-                        response.getBranchName().equals("Main Branch") &&
-                        response.getProductName().equals("Laptop") &&
-                        response.getStock() == 50
-                )
-                .verifyComplete();
-
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(branchRepository).findAllByFranchiseId(franchiseId);
-        verify(productRepository).findProductWithHighestStockByBranchId(branchId);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when franchise not found")
-    void shouldThrowExceptionWhenFranchiseNotFound() {
-        // Arrange
-        when(franchiseRepository.getFranchiseById(any(UUID.class)))
-                .thenReturn(Mono.empty());
-
-        // Act
-        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectErrorMatches(e -> e instanceof RuntimeException &&
-                        e.getMessage().contains("Franchise not found"))
-                .verify();
-
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(branchRepository, never()).findAllByFranchiseId(any());
-    }
-
-    @Test
-    @DisplayName("Should return empty flux when franchise has no branches")
-    void shouldReturnEmptyFluxWhenFranchiseHasNoBranches() {
-        // Arrange
-        Franchise franchiseWithId = Franchise.restore(franchiseId, "KFC");
-
-        when(franchiseRepository.getFranchiseById(franchiseId))
-                .thenReturn(Mono.just(franchiseWithId));
-        when(branchRepository.findAllByFranchiseId(franchiseId))
-                .thenReturn(Flux.empty());
-
-        // Act
-        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
-
-        // Assert
-        StepVerifier.create(result)
-                .verifyComplete();
-
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(branchRepository).findAllByFranchiseId(franchiseId);
-        verify(productRepository, never()).findProductWithHighestStockByBranchId(any());
-    }
-
-    @Test
-    @DisplayName("Should skip branches without products")
-    void shouldSkipBranchesWithoutProducts() {
-        // Arrange
-        Franchise franchiseWithId = Franchise.restore(franchiseId, "KFC");
-        Branch branchWithId = Branch.restore(branchId, "Empty Branch");
-
-        when(franchiseRepository.getFranchiseById(franchiseId))
-                .thenReturn(Mono.just(franchiseWithId));
-        when(branchRepository.findAllByFranchiseId(franchiseId))
-                .thenReturn(Flux.just(branchWithId));
-        when(productRepository.findProductWithHighestStockByBranchId(branchId))
-                .thenReturn(Mono.empty());
-
-        // Act
-        Flux<MaxStockByBranch> result = franchiseUseCase.getProductsWithHighestStockByFranchise(franchiseId);
-
-        // Assert
-        StepVerifier.create(result)
-                .verifyComplete();
-
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(branchRepository).findAllByFranchiseId(franchiseId);
-        verify(productRepository).findProductWithHighestStockByBranchId(branchId);
+        verify(franchiseRepository).save(any(Franchise.class));
     }
 
     @Test
     @DisplayName("Should update franchise name successfully")
     void shouldUpdateFranchiseNameSuccessfully() {
         // Arrange
-        Franchise franchiseWithId = Franchise.restore(franchiseId, "KFC");
-        Franchise updatedFranchise = Franchise.restore(franchiseId, "KFC Updated");
+        Franchise updatedFranchise = Franchise.builder()
+                .id(franchiseId)
+                .name("KFC Premium")
+                .branches(new ArrayList<>())
+                .build();
 
-        when(franchiseRepository.getFranchiseById(franchiseId))
-                .thenReturn(Mono.just(franchiseWithId));
-        when(franchiseRepository.updateFranchise(any(Franchise.class)))
+        when(franchiseRepository.findById(franchiseId))
+                .thenReturn(Mono.just(franchise));
+        when(franchiseRepository.update(any(Franchise.class)))
                 .thenReturn(Mono.just(updatedFranchise));
 
         // Act
-        Mono<Franchise> result = franchiseUseCase.updateFranchiseName(franchiseId, "KFC Updated");
+        Mono<Franchise> result = franchiseUseCase.updateFranchiseName(updatedFranchise);
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(f -> f.getName().equals("KFC Updated"))
+                .expectNextMatches(f -> f.getName().equals("KFC Premium"))
                 .verifyComplete();
 
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(franchiseRepository).updateFranchise(any(Franchise.class));
+        verify(franchiseRepository).findById(franchiseId);
+        verify(franchiseRepository).update(any(Franchise.class));
     }
 
     @Test
     @DisplayName("Should throw exception when updating non-existent franchise")
     void shouldThrowExceptionWhenUpdatingNonExistentFranchise() {
         // Arrange
-        when(franchiseRepository.getFranchiseById(any(UUID.class)))
+        Franchise updatedFranchise = Franchise.builder()
+                .id(franchiseId)
+                .name("New Name")
+                .branches(new ArrayList<>())
+                .build();
+
+        when(franchiseRepository.findById(franchiseId))
                 .thenReturn(Mono.empty());
 
         // Act
-        Mono<Franchise> result = franchiseUseCase.updateFranchiseName(franchiseId, "New Name");
+        Mono<Franchise> result = franchiseUseCase.updateFranchiseName(updatedFranchise);
 
         // Assert
         StepVerifier.create(result)
                 .expectError(FranchiseException.class)
                 .verify();
 
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(franchiseRepository, never()).updateFranchise(any());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when updating with null name")
-    void shouldThrowExceptionWhenUpdatingWithNullName() {
-        // Arrange
-        Franchise franchiseWithId = Franchise.restore(franchiseId, "KFC");
-
-        when(franchiseRepository.getFranchiseById(franchiseId))
-                .thenReturn(Mono.just(franchiseWithId));
-
-        // Act
-        Mono<Franchise> result = franchiseUseCase.updateFranchiseName(franchiseId, null);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectError()
-                .verify();
-
-        verify(franchiseRepository).getFranchiseById(franchiseId);
-        verify(franchiseRepository, never()).updateFranchise(any());
+        verify(franchiseRepository).findById(franchiseId);
+        verify(franchiseRepository, never()).update(any());
     }
 }
+

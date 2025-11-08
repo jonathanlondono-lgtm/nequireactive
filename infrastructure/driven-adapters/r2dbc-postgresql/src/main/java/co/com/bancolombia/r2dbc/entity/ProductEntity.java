@@ -1,5 +1,6 @@
 package co.com.bancolombia.r2dbc.entity;
 
+import jakarta.persistence.GeneratedValue;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ProductEntity {
 
     @Id
+    @GeneratedValue
     private UUID id;
 
     @Column("branch_id")

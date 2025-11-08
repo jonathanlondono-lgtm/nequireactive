@@ -1,14 +1,12 @@
 package co.com.bancolombia.model.branch.gateways;
 
 import co.com.bancolombia.model.branch.Branch;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
 public interface BranchRepository {
-    Mono<Branch> addBranchToFranchise(UUID franchiseId, String branchName);
+    Mono<Branch> save(Branch branch);
     Mono<Branch> findById(UUID id);
-    Flux<Branch> findAllByFranchiseId(UUID franchiseId);
-    Mono<Branch> updateBranch(Branch branch);
+    Mono<Branch> update(Branch branch);
 }

@@ -2,6 +2,8 @@ package co.com.bancolombia.api.router;
 
 import co.com.bancolombia.api.handler.ProductHandler;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -23,7 +25,7 @@ public class ProductRouter {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/api/v1/products",
+                    path = "/api/branches/{branchId}/products",
                     method = RequestMethod.POST,
                     beanClass = ProductHandler.class,
                     beanMethod = "addProduct",
@@ -31,17 +33,20 @@ public class ProductRouter {
                             tags = {"Product"},
                             summary = "Agregar producto a sucursal",
                             operationId = "addProduct",
+                            parameters = {
+                                    @Parameter(name = "branchId", in = ParameterIn.PATH, required = true, description = "ID de la sucursal")
+                            },
                             requestBody = @RequestBody(
                                     required = true,
-                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.ProductRequest.class))
+                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.ProductDTO.class))
                             ),
                             responses = {
-                                    @ApiResponse(responseCode = "201", description = "Producto creado exitosamente")
+                                    @ApiResponse(responseCode = "200", description = "Producto creado exitosamente")
                             }
                     )
             ),
             @RouterOperation(
-                    path = "/api/v1/products",
+                    path = "/api/products/{productId}",
                     method = RequestMethod.DELETE,
                     beanClass = ProductHandler.class,
                     beanMethod = "deleteProduct",
@@ -49,17 +54,16 @@ public class ProductRouter {
                             tags = {"Product"},
                             summary = "Eliminar producto",
                             operationId = "deleteProduct",
-                            requestBody = @RequestBody(
-                                    required = true,
-                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.DeleteProductRequest.class))
-                            ),
+                            parameters = {
+                                    @Parameter(name = "productId", in = ParameterIn.PATH, required = true, description = "ID del producto")
+                            },
                             responses = {
                                     @ApiResponse(responseCode = "204", description = "Producto eliminado")
                             }
                     )
             ),
             @RouterOperation(
-                    path = "/api/v1/products/stock",
+                    path = "/api/products/stock",
                     method = RequestMethod.PUT,
                     beanClass = ProductHandler.class,
                     beanMethod = "updateProductStock",
@@ -69,7 +73,7 @@ public class ProductRouter {
                             operationId = "updateProductStock",
                             requestBody = @RequestBody(
                                     required = true,
-                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.UpdateStockRequest.class))
+                                    content = @Content(schema = @Schema(implementation = co.com.bancolombia.api.dto.request.UpdateProductStockRequest.class))
                             ),
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "Stock actualizado")
@@ -77,7 +81,7 @@ public class ProductRouter {
                     )
             ),
             @RouterOperation(
-                    path = "/api/v1/products/name",
+                    path = "/api/products/name",
                     method = RequestMethod.PUT,
                     beanClass = ProductHandler.class,
                     beanMethod = "updateProductName",
@@ -93,14 +97,31 @@ public class ProductRouter {
                                     @ApiResponse(responseCode = "200", description = "Nombre actualizado")
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/api/franchises/{franchiseId}/max-stock",
+                    method = RequestMethod.GET,
+                    beanClass = ProductHandler.class,
+                    beanMethod = "getMaxStockByFranchise",
+                    operation = @Operation(
+                            tags = {"Product"},
+                            summary = "Obtener producto con mayor stock por sucursal de una franquicia",
+                            operationId = "getMaxStockByFranchise",
+                            parameters = {
+                                    @Parameter(name = "franchiseId", in = ParameterIn.PATH, required = true, description = "ID de la franquicia")
+                            },
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Lista de productos con mayor stock por sucursal")
+                            }
+                    )
             )
     })
     public RouterFunction<ServerResponse> productRoutes(ProductHandler handler) {
-        return RouterFunctions.nest(path("/api/v1/products"),
-                RouterFunctions.route(POST(""), handler::addProduct)
-                        .andRoute(DELETE(""), handler::deleteProduct)
-                        .andRoute(PUT("/stock"), handler::updateProductStock)
-                        .andRoute(PUT("/name"), handler::updateProductName)
-        );
+        return RouterFunctions.route(POST("/api/branches/{branchId}/products"), handler::addProduct)
+                .andRoute(DELETE("/api/products/{productId}"), handler::deleteProduct)
+                .andRoute(PUT("/api/products/stock"), handler::updateProductStock)
+                .andRoute(PUT("/api/products/name"), handler::updateProductName)
+                .andRoute(GET("/api/franchises/{franchiseId}/max-stock"), handler::getMaxStockByFranchise);
     }
 }
+

@@ -2,9 +2,7 @@ package co.com.bancolombia.r2dbc.adapter;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.r2dbc.entity.BranchEntity;
-import co.com.bancolombia.r2dbc.entity.FranchiseEntity;
 import co.com.bancolombia.r2dbc.repository.BranchReactiveRepository;
-import co.com.bancolombia.r2dbc.repository.FranchiseReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,21 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BranchAdapterTest {
-
-    @Mock
-    private FranchiseReactiveRepository franchiseRepository;
 
     @Mock
     private BranchReactiveRepository branchRepository;
@@ -36,7 +30,7 @@ class BranchAdapterTest {
 
     private UUID franchiseId;
     private UUID branchId;
-    private FranchiseEntity franchiseEntity;
+    private Branch branch;
     private BranchEntity branchEntity;
 
     @BeforeEach
@@ -44,9 +38,11 @@ class BranchAdapterTest {
         franchiseId = UUID.randomUUID();
         branchId = UUID.randomUUID();
 
-        franchiseEntity = FranchiseEntity.builder()
-                .id(franchiseId)
-                .name("KFC")
+        branch = Branch.builder()
+                .id(branchId)
+                .name("Main Branch")
+                .franchiseId(franchiseId)
+                .products(new ArrayList<>())
                 .build();
 
         branchEntity = BranchEntity.builder()
@@ -57,42 +53,21 @@ class BranchAdapterTest {
     }
 
     @Test
-    @DisplayName("Should add branch to franchise successfully")
-    void shouldAddBranchToFranchiseSuccessfully() {
+    @DisplayName("Should save branch successfully")
+    void shouldSaveBranchSuccessfully() {
         // Arrange
-        when(franchiseRepository.findById(franchiseId))
-                .thenReturn(Mono.just(franchiseEntity));
-        when(branchRepository.insertBranch(any(UUID.class), eq(franchiseId), eq("New Branch")))
-                .thenReturn(Mono.empty());
+        when(branchRepository.save(any(BranchEntity.class)))
+                .thenReturn(Mono.just(branchEntity));
 
         // Act
-        Mono<Branch> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
+        Mono<Branch> result = branchAdapter.save(branch);
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(branch -> branch.getName().equals("New Branch") && branch.getId() != null)
+                .expectNextMatches(b -> b.getName().equals("Main Branch") && b.getId().equals(branchId))
                 .verifyComplete();
 
-        verify(franchiseRepository).findById(franchiseId);
-        verify(branchRepository).insertBranch(any(UUID.class), eq(franchiseId), eq("New Branch"));
-    }
-
-    @Test
-    @DisplayName("Should return error when franchise not found")
-    void shouldReturnErrorWhenFranchiseNotFound() {
-        // Arrange
-        when(franchiseRepository.findById(any(UUID.class)))
-                .thenReturn(Mono.empty());
-
-        // Act
-        Mono<Branch> result = branchAdapter.addBranchToFranchise(franchiseId, "New Branch");
-
-        // Assert
-        StepVerifier.create(result)
-                .verifyComplete();
-
-        verify(franchiseRepository).findById(franchiseId);
-        verify(branchRepository, never()).insertBranch(any(), any(), anyString());
+        verify(branchRepository).save(any(BranchEntity.class));
     }
 
     @Test
@@ -107,7 +82,7 @@ class BranchAdapterTest {
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(branch -> branch.getName().equals("Main Branch"))
+                .expectNextMatches(b -> b.getName().equals("Main Branch") && b.getFranchiseId().equals(franchiseId))
                 .verifyComplete();
 
         verify(branchRepository).findById(branchId);
@@ -121,94 +96,44 @@ class BranchAdapterTest {
                 .thenReturn(Mono.empty());
 
         // Act
-        Mono<Branch> result = branchAdapter.findById(branchId);
+        Mono<Branch> result = branchAdapter.findById(UUID.randomUUID());
 
         // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
-        verify(branchRepository).findById(branchId);
+        verify(branchRepository).findById(any(UUID.class));
     }
 
     @Test
-    @DisplayName("Should find all branches by franchise id")
-    void shouldFindAllBranchesByFranchiseId() {
+    @DisplayName("Should update branch successfully")
+    void shouldUpdateBranchSuccessfully() {
         // Arrange
-        BranchEntity branch2 = BranchEntity.builder()
-                .id(UUID.randomUUID())
+        Branch updatedBranch = Branch.builder()
+                .id(branchId)
+                .name("Updated Branch")
                 .franchiseId(franchiseId)
-                .name("Second Branch")
+                .products(new ArrayList<>())
                 .build();
 
-        when(branchRepository.findAllByFranchiseId(franchiseId))
-                .thenReturn(Flux.just(branchEntity, branch2));
+        BranchEntity updatedEntity = BranchEntity.builder()
+                .id(branchId)
+                .franchiseId(franchiseId)
+                .name("Updated Branch")
+                .build();
+
+        when(branchRepository.save(any(BranchEntity.class)))
+                .thenReturn(Mono.just(updatedEntity));
 
         // Act
-        Flux<Branch> result = branchAdapter.findAllByFranchiseId(franchiseId);
+        Mono<Branch> result = branchAdapter.update(updatedBranch);
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(branch -> branch.getName().equals("Main Branch"))
-                .expectNextMatches(branch -> branch.getName().equals("Second Branch"))
+                .expectNextMatches(b -> b.getName().equals("Updated Branch"))
                 .verifyComplete();
 
-        verify(branchRepository).findAllByFranchiseId(franchiseId);
-    }
-
-    @Test
-    @DisplayName("Should return empty flux when no branches found")
-    void shouldReturnEmptyFluxWhenNoBranchesFound() {
-        // Arrange
-        when(branchRepository.findAllByFranchiseId(any(UUID.class)))
-                .thenReturn(Flux.empty());
-
-        // Act
-        Flux<Branch> result = branchAdapter.findAllByFranchiseId(franchiseId);
-
-        // Assert
-        StepVerifier.create(result)
-                .verifyComplete();
-
-        verify(branchRepository).findAllByFranchiseId(franchiseId);
-    }
-
-    @Test
-    @DisplayName("Should update branch name successfully")
-    void shouldUpdateBranchNameSuccessfully() {
-        // Arrange
-        Branch branchToUpdate = Branch.restore(branchId, "Updated Branch");
-
-        when(branchRepository.updateBranchName(eq("Updated Branch"), eq(branchId)))
-                .thenReturn(Mono.just(1));
-
-        // Act
-        Mono<Branch> result = branchAdapter.updateBranch(branchToUpdate);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectNextMatches(branch -> branch.getName().equals("Updated Branch"))
-                .verifyComplete();
-
-        verify(branchRepository).updateBranchName("Updated Branch", branchId);
-    }
-
-    @Test
-    @DisplayName("Should handle update branch when no rows affected")
-    void shouldHandleUpdateBranchWhenNoRowsAffected() {
-        // Arrange
-        Branch branchToUpdate = Branch.restore(branchId, "Updated Branch");
-
-        when(branchRepository.updateBranchName(anyString(), any(UUID.class)))
-                .thenReturn(Mono.just(0));
-
-        // Act
-        Mono<Branch> result = branchAdapter.updateBranch(branchToUpdate);
-
-        // Assert
-        StepVerifier.create(result)
-                .expectNextMatches(branch -> branch.getName().equals("Updated Branch"))
-                .verifyComplete();
-
-        verify(branchRepository).updateBranchName("Updated Branch", branchId);
+        verify(branchRepository).save(any(BranchEntity.class));
     }
 }
+

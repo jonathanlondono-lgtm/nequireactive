@@ -1,16 +1,22 @@
 package co.com.bancolombia.r2dbc.mapper;
+
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.r2dbc.entity.FranchiseEntity;
+
+import java.util.ArrayList;
 
 public final class FranchiseMapper {
 
     private FranchiseMapper() {
-        // Evita instanciación
     }
 
     public static Franchise toDomain(FranchiseEntity entity) {
         if (entity == null) return null;
-        return Franchise.restore(entity.getId(), entity.getName());
+        return Franchise.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .branches(new ArrayList<>())
+                .build();
     }
 
     public static FranchiseEntity toEntity(Franchise franchise) {
@@ -21,3 +27,4 @@ public final class FranchiseMapper {
                 .build();
     }
 }
+
