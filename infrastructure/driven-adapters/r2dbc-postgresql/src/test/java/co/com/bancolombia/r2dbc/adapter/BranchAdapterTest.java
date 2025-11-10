@@ -55,14 +55,11 @@ class BranchAdapterTest {
     @Test
     @DisplayName("Should save branch successfully")
     void shouldSaveBranchSuccessfully() {
-        // Arrange
         when(branchRepository.save(any(BranchEntity.class)))
                 .thenReturn(Mono.just(branchEntity));
 
-        // Act
         Mono<Branch> result = branchAdapter.save(branch);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(b -> b.getName().equals("Main Branch") && b.getId().equals(branchId))
                 .verifyComplete();
@@ -73,14 +70,11 @@ class BranchAdapterTest {
     @Test
     @DisplayName("Should find branch by id successfully")
     void shouldFindBranchByIdSuccessfully() {
-        // Arrange
         when(branchRepository.findById(branchId))
                 .thenReturn(Mono.just(branchEntity));
 
-        // Act
         Mono<Branch> result = branchAdapter.findById(branchId);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(b -> b.getName().equals("Main Branch") && b.getFranchiseId().equals(franchiseId))
                 .verifyComplete();
@@ -91,14 +85,11 @@ class BranchAdapterTest {
     @Test
     @DisplayName("Should return empty when branch not found by id")
     void shouldReturnEmptyWhenBranchNotFoundById() {
-        // Arrange
         when(branchRepository.findById(any(UUID.class)))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Branch> result = branchAdapter.findById(UUID.randomUUID());
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
@@ -108,7 +99,6 @@ class BranchAdapterTest {
     @Test
     @DisplayName("Should update branch successfully")
     void shouldUpdateBranchSuccessfully() {
-        // Arrange
         Branch updatedBranch = Branch.builder()
                 .id(branchId)
                 .name("Updated Branch")
@@ -125,10 +115,8 @@ class BranchAdapterTest {
         when(branchRepository.save(any(BranchEntity.class)))
                 .thenReturn(Mono.just(updatedEntity));
 
-        // Act
         Mono<Branch> result = branchAdapter.update(updatedBranch);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(b -> b.getName().equals("Updated Branch"))
                 .verifyComplete();

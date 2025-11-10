@@ -58,14 +58,11 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should save product successfully")
     void shouldSaveProductSuccessfully() {
-        // Arrange
         when(productRepository.save(any(ProductEntity.class)))
                 .thenReturn(Mono.just(productEntity));
 
-        // Act
         Mono<Product> result = productAdapter.save(product);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(p -> p.getName().equals("Laptop") && p.getStock() == 10)
                 .verifyComplete();
@@ -76,14 +73,11 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should find product by id successfully")
     void shouldFindProductByIdSuccessfully() {
-        // Arrange
         when(productRepository.findById(productId))
                 .thenReturn(Mono.just(productEntity));
 
-        // Act
         Mono<Product> result = productAdapter.findById(productId);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(p -> p.getName().equals("Laptop") && p.getStock() == 10)
                 .verifyComplete();
@@ -94,14 +88,11 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should return empty when product not found")
     void shouldReturnEmptyWhenProductNotFound() {
-        // Arrange
         when(productRepository.findById(any(UUID.class)))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Product> result = productAdapter.findById(UUID.randomUUID());
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
@@ -111,7 +102,6 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should update product successfully")
     void shouldUpdateProductSuccessfully() {
-        // Arrange
         Product updatedProduct = Product.builder()
                 .id(productId)
                 .name("Gaming Laptop")
@@ -129,10 +119,8 @@ class ProductAdapterTest {
         when(productRepository.save(any(ProductEntity.class)))
                 .thenReturn(Mono.just(updatedEntity));
 
-        // Act
         Mono<Product> result = productAdapter.update(updatedProduct);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(p -> p.getName().equals("Gaming Laptop") && p.getStock() == 50)
                 .verifyComplete();
@@ -143,14 +131,11 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should delete product successfully")
     void shouldDeleteProductSuccessfully() {
-        // Arrange
         when(productRepository.deleteById(productId))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Void> result = productAdapter.deleteById(productId);
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
@@ -160,7 +145,6 @@ class ProductAdapterTest {
     @Test
     @DisplayName("Should find products with highest stock by franchise")
     void shouldFindProductsWithHighestStockByFranchise() {
-        // Arrange
         ProductEntity product1 = ProductEntity.builder()
                 .id(UUID.randomUUID())
                 .branchId(branchId)
@@ -178,10 +162,8 @@ class ProductAdapterTest {
         when(productRepository.findProductsWithHighestStockByFranchiseId(franchiseId))
                 .thenReturn(Flux.just(product1, product2));
 
-        // Act
         Flux<Product> result = productAdapter.findProductsWithHighestStockByFranchiseId(franchiseId);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(p -> p.getName().equals("Product 1") && p.getStock() == 50)
                 .expectNextMatches(p -> p.getName().equals("Product 2") && p.getStock() == 30)

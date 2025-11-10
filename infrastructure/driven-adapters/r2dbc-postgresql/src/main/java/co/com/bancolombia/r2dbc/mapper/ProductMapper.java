@@ -6,7 +6,6 @@ import co.com.bancolombia.r2dbc.entity.ProductEntity;
 public final class ProductMapper {
 
     private ProductMapper() {
-        // Evita instanciación
     }
 
     public static Product toDomain(ProductEntity entity) {

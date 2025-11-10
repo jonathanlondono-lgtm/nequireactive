@@ -14,13 +14,12 @@ class FranchiseTest {
     @Test
     @DisplayName("Should create franchise with builder")
     void shouldCreateFranchiseWithBuilder() {
-        // Arrange & Act
         Franchise franchise = Franchise.builder()
                 .name("KFC")
                 .branches(new ArrayList<>())
                 .build();
 
-        // Assert
+
         assertNotNull(franchise);
         assertEquals("KFC", franchise.getName());
         assertNotNull(franchise.getBranches());
@@ -30,17 +29,16 @@ class FranchiseTest {
     @Test
     @DisplayName("Should create franchise with id")
     void shouldCreateFranchiseWithId() {
-        // Arrange
+
         UUID id = UUID.randomUUID();
 
-        // Act
+
         Franchise franchise = Franchise.builder()
                 .id(id)
                 .name("McDonald's")
                 .branches(new ArrayList<>())
                 .build();
 
-        // Assert
         assertEquals(id, franchise.getId());
         assertEquals("McDonald's", franchise.getName());
     }
@@ -48,23 +46,20 @@ class FranchiseTest {
     @Test
     @DisplayName("Should allow modifying franchise name")
     void shouldAllowModifyingFranchiseName() {
-        // Arrange
+
         Franchise franchise = Franchise.builder()
                 .name("Old Name")
                 .branches(new ArrayList<>())
                 .build();
 
-        // Act
         franchise.setName("New Name");
 
-        // Assert
         assertEquals("New Name", franchise.getName());
     }
 
     @Test
     @DisplayName("Should allow adding branches to list")
     void shouldAllowAddingBranches() {
-        // Arrange
         Franchise franchise = Franchise.builder()
                 .name("KFC")
                 .branches(new ArrayList<>())
@@ -76,10 +71,8 @@ class FranchiseTest {
                 .products(new ArrayList<>())
                 .build();
 
-        // Act
         franchise.getBranches().add(branch);
 
-        // Assert
         assertEquals(1, franchise.getBranches().size());
         assertTrue(franchise.getBranches().contains(branch));
     }
@@ -87,7 +80,6 @@ class FranchiseTest {
     @Test
     @DisplayName("Should allow adding multiple branches")
     void shouldAllowAddingMultipleBranches() {
-        // Arrange
         Franchise franchise = Franchise.builder()
                 .name("KFC")
                 .branches(new ArrayList<>())
@@ -105,11 +97,9 @@ class FranchiseTest {
                 .products(new ArrayList<>())
                 .build();
 
-        // Act
         franchise.getBranches().add(branch1);
         franchise.getBranches().add(branch2);
 
-        // Assert
         assertEquals(2, franchise.getBranches().size());
         assertTrue(franchise.getBranches().contains(branch1));
         assertTrue(franchise.getBranches().contains(branch2));

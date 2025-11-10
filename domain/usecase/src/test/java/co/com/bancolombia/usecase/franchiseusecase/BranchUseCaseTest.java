@@ -2,6 +2,7 @@ package co.com.bancolombia.usecase.franchiseusecase;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
+import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.usecase.branch.BranchUseCase;
@@ -60,7 +61,6 @@ class BranchUseCaseTest {
     @Test
     @DisplayName("Should add branch to franchise successfully")
     void shouldAddBranchToFranchiseSuccessfully() {
-        // Arrange
         Branch newBranch = Branch.builder()
                 .name("New Branch")
                 .franchiseId(franchiseId)
@@ -79,10 +79,8 @@ class BranchUseCaseTest {
         when(branchRepository.save(any(Branch.class)))
                 .thenReturn(Mono.just(savedBranch));
 
-        // Act
         Mono<Branch> result = branchUseCase.addBranchToFranchise(newBranch);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(b -> b.getName().equals("New Branch") && b.getId() != null)
                 .verifyComplete();
@@ -94,7 +92,6 @@ class BranchUseCaseTest {
     @Test
     @DisplayName("Should throw exception when franchise not found")
     void shouldThrowExceptionWhenFranchiseNotFound() {
-        // Arrange
         Branch newBranch = Branch.builder()
                 .name("New Branch")
                 .franchiseId(franchiseId)
@@ -104,12 +101,10 @@ class BranchUseCaseTest {
         when(franchiseRepository.findById(franchiseId))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Branch> result = branchUseCase.addBranchToFranchise(newBranch);
 
-        // Assert
         StepVerifier.create(result)
-                .expectError(FranchiseException.class)
+                .expectError(BusinessException.class)
                 .verify();
 
         verify(franchiseRepository).findById(franchiseId);
@@ -119,7 +114,6 @@ class BranchUseCaseTest {
     @Test
     @DisplayName("Should update branch name successfully")
     void shouldUpdateBranchNameSuccessfully() {
-        // Arrange
         Branch updatedBranch = Branch.builder()
                 .id(branchId)
                 .name("Updated Branch Name")
@@ -132,10 +126,8 @@ class BranchUseCaseTest {
         when(branchRepository.update(any(Branch.class)))
                 .thenReturn(Mono.just(updatedBranch));
 
-        // Act
         Mono<Branch> result = branchUseCase.updateBranchName(updatedBranch);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(b -> b.getName().equals("Updated Branch Name"))
                 .verifyComplete();
@@ -147,7 +139,6 @@ class BranchUseCaseTest {
     @Test
     @DisplayName("Should throw exception when updating non-existent branch")
     void shouldThrowExceptionWhenUpdatingNonExistentBranch() {
-        // Arrange
         Branch updatedBranch = Branch.builder()
                 .id(branchId)
                 .name("New Name")
@@ -157,12 +148,10 @@ class BranchUseCaseTest {
         when(branchRepository.findById(branchId))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Branch> result = branchUseCase.updateBranchName(updatedBranch);
 
-        // Assert
         StepVerifier.create(result)
-                .expectError(BranchException.class)
+                .expectError(BusinessException.class)
                 .verify();
 
         verify(branchRepository).findById(branchId);

@@ -14,14 +14,12 @@ class BranchTest {
     @Test
     @DisplayName("Should create branch with builder")
     void shouldCreateBranchWithBuilder() {
-        // Arrange & Act
         Branch branch = Branch.builder()
                 .name("Main Branch")
                 .franchiseId(UUID.randomUUID())
                 .products(new ArrayList<>())
                 .build();
 
-        // Assert
         assertNotNull(branch);
         assertEquals("Main Branch", branch.getName());
         assertNotNull(branch.getFranchiseId());
@@ -32,11 +30,9 @@ class BranchTest {
     @Test
     @DisplayName("Should create branch with id")
     void shouldCreateBranchWithId() {
-        // Arrange
         UUID id = UUID.randomUUID();
         UUID franchiseId = UUID.randomUUID();
 
-        // Act
         Branch branch = Branch.builder()
                 .id(id)
                 .name("Restored Branch")
@@ -44,7 +40,6 @@ class BranchTest {
                 .products(new ArrayList<>())
                 .build();
 
-        // Assert
         assertEquals(id, branch.getId());
         assertEquals("Restored Branch", branch.getName());
         assertEquals(franchiseId, branch.getFranchiseId());
@@ -53,24 +48,20 @@ class BranchTest {
     @Test
     @DisplayName("Should allow modifying branch name")
     void shouldAllowModifyingBranchName() {
-        // Arrange
         Branch branch = Branch.builder()
                 .name("Old Name")
                 .franchiseId(UUID.randomUUID())
                 .products(new ArrayList<>())
                 .build();
 
-        // Act
         branch.setName("New Name");
 
-        // Assert
         assertEquals("New Name", branch.getName());
     }
 
     @Test
     @DisplayName("Should allow adding products to list")
     void shouldAllowAddingProducts() {
-        // Arrange
         Branch branch = Branch.builder()
                 .name("Branch")
                 .franchiseId(UUID.randomUUID())
@@ -83,10 +74,8 @@ class BranchTest {
                 .branchId(branch.getFranchiseId())
                 .build();
 
-        // Act
         branch.getProducts().add(product);
 
-        // Assert
         assertEquals(1, branch.getProducts().size());
         assertTrue(branch.getProducts().contains(product));
     }

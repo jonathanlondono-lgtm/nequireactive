@@ -1,5 +1,6 @@
 package co.com.bancolombia.usecase.franchiseusecase;
 
+import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,6 @@ class FranchiseUseCaseTest {
     @Test
     @DisplayName("Should create franchise successfully")
     void shouldCreateFranchiseSuccessfully() {
-        // Arrange
         Franchise newFranchise = Franchise.builder()
                 .name("McDonalds")
                 .branches(new ArrayList<>())
@@ -58,10 +58,8 @@ class FranchiseUseCaseTest {
         when(franchiseRepository.save(any(Franchise.class)))
                 .thenReturn(Mono.just(savedFranchise));
 
-        // Act
         Mono<Franchise> result = franchiseUseCase.createFranchise(newFranchise);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(f -> f.getName().equals("McDonalds") && f.getId() != null)
                 .verifyComplete();
@@ -72,7 +70,6 @@ class FranchiseUseCaseTest {
     @Test
     @DisplayName("Should update franchise name successfully")
     void shouldUpdateFranchiseNameSuccessfully() {
-        // Arrange
         Franchise updatedFranchise = Franchise.builder()
                 .id(franchiseId)
                 .name("KFC Premium")
@@ -84,10 +81,8 @@ class FranchiseUseCaseTest {
         when(franchiseRepository.update(any(Franchise.class)))
                 .thenReturn(Mono.just(updatedFranchise));
 
-        // Act
         Mono<Franchise> result = franchiseUseCase.updateFranchiseName(updatedFranchise);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(f -> f.getName().equals("KFC Premium"))
                 .verifyComplete();
@@ -99,7 +94,6 @@ class FranchiseUseCaseTest {
     @Test
     @DisplayName("Should throw exception when updating non-existent franchise")
     void shouldThrowExceptionWhenUpdatingNonExistentFranchise() {
-        // Arrange
         Franchise updatedFranchise = Franchise.builder()
                 .id(franchiseId)
                 .name("New Name")
@@ -109,12 +103,10 @@ class FranchiseUseCaseTest {
         when(franchiseRepository.findById(franchiseId))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Franchise> result = franchiseUseCase.updateFranchiseName(updatedFranchise);
 
-        // Assert
         StepVerifier.create(result)
-                .expectError(FranchiseException.class)
+                .expectError(BusinessException.class)
                 .verify();
 
         verify(franchiseRepository).findById(franchiseId);

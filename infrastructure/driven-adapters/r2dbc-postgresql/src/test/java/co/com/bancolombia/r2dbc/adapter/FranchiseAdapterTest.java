@@ -51,14 +51,11 @@ class FranchiseAdapterTest {
     @Test
     @DisplayName("Should save franchise successfully")
     void shouldSaveFranchiseSuccessfully() {
-        // Arrange
         when(franchiseRepository.save(any(FranchiseEntity.class)))
                 .thenReturn(Mono.just(franchiseEntity));
 
-        // Act
         Mono<Franchise> result = franchiseAdapter.save(franchise);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(f -> f.getName().equals("KFC") && f.getId().equals(franchiseId))
                 .verifyComplete();
@@ -69,14 +66,11 @@ class FranchiseAdapterTest {
     @Test
     @DisplayName("Should find franchise by id successfully")
     void shouldFindFranchiseByIdSuccessfully() {
-        // Arrange
         when(franchiseRepository.findById(franchiseId))
                 .thenReturn(Mono.just(franchiseEntity));
 
-        // Act
         Mono<Franchise> result = franchiseAdapter.findById(franchiseId);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(f -> f.getName().equals("KFC") && f.getId().equals(franchiseId))
                 .verifyComplete();
@@ -87,14 +81,11 @@ class FranchiseAdapterTest {
     @Test
     @DisplayName("Should return empty when franchise not found by id")
     void shouldReturnEmptyWhenFranchiseNotFoundById() {
-        // Arrange
         when(franchiseRepository.findById(any(UUID.class)))
                 .thenReturn(Mono.empty());
 
-        // Act
         Mono<Franchise> result = franchiseAdapter.findById(UUID.randomUUID());
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
@@ -104,7 +95,6 @@ class FranchiseAdapterTest {
     @Test
     @DisplayName("Should update franchise successfully")
     void shouldUpdateFranchiseSuccessfully() {
-        // Arrange
         Franchise updatedFranchise = Franchise.builder()
                 .id(franchiseId)
                 .name("KFC Premium")
@@ -119,10 +109,8 @@ class FranchiseAdapterTest {
         when(franchiseRepository.save(any(FranchiseEntity.class)))
                 .thenReturn(Mono.just(updatedEntity));
 
-        // Act
         Mono<Franchise> result = franchiseAdapter.update(updatedFranchise);
 
-        // Assert
         StepVerifier.create(result)
                 .expectNextMatches(f -> f.getName().equals("KFC Premium"))
                 .verifyComplete();
